@@ -4,6 +4,7 @@ import com.sputnik.ouidb.entity.Bz2DecompressingEntity;
 import com.sputnik.ouidb.exception.NoRecordsFoundException;
 import com.sputnik.ouidb.model.Address;
 import com.sputnik.ouidb.model.Organization;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.client.entity.GzipDecompressingEntity;
@@ -12,8 +13,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,8 +34,8 @@ import java.util.TreeMap;
  * }
  * </pre>
  */
+@Slf4j
 public class OUIDBDownloader {
-    private static final Logger logger = LoggerFactory.getLogger(OUIDBDownloader.class);
 
     private String[] ouiDbUrls = new String[]{"https://linuxnet.ca/ieee/oui.txt.bz2", "https://linuxnet.ca/ieee/oui.txt.gz", "https://linuxnet.ca/ieee/oui.txt"};
 
@@ -59,7 +58,7 @@ public class OUIDBDownloader {
         Iterator<String> url = Arrays.asList(ouiDbUrls).iterator();
         while (result == null && url.hasNext()) {
             String ouiDbUrl = url.next();
-            logger.info("Downloading OUIs DB from {}", ouiDbUrl);
+            log.info("Downloading OUIs DB from {}", ouiDbUrl);
             try (CloseableHttpClient cachingClient = HttpClientBuilder.create().build()) {
                 HttpGet httpget = new HttpGet(ouiDbUrl);
                 CloseableHttpResponse response = cachingClient.execute(httpget);
@@ -72,7 +71,7 @@ public class OUIDBDownloader {
                     result = new StringReader(EntityUtils.toString(response.getEntity()));
                 }
             } catch (IOException e) {
-                logger.warn("Error downloading OUIs from {} - {}: {}", ouiDbUrl, e.getClass().getSimpleName(), e.getMessage());
+                log.warn("Error downloading OUIs from {} - {}: {}", ouiDbUrl, e.getClass().getSimpleName(), e.getMessage());
             }
         }
 
