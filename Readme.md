@@ -3,7 +3,7 @@
 Simple tool that does the following steps:
 
 + Clones specified git repo.
-+ Downloads latest oui-db from https://linuxnet.ca/
++ Downloads latest oui-db from https://linuxnet.ca/ieee/oui/
 + Parses and converts it to json.
 + If the json file has any changes from the one in the repo, it uploads it to the git repo.
 
