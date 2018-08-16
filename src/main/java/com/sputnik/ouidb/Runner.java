@@ -74,7 +74,7 @@ public class Runner {
             dataPath.mkdirs();
         }
         try {
-            log.info("Trying to open existing it repo in {}", dataPath);
+            log.info("Trying to open existing git repo in {}", dataPath);
             git = Git.open(dataPath);
             log.info("Repo opened, pulling latest changes.");
             git.pull().call();
