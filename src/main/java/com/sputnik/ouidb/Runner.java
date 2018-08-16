@@ -56,7 +56,10 @@ public class Runner {
             git.add().addFilepattern(getOuiDBFile().getName()).call();
             git.commit().setMessage("Updated OUIDB json file").call();
             git.push().call();
+        } else {
+            log.info("No changes detected on OUIDB File, nothing to do.");
         }
+        
         log.info("Done :-)");
     }
 
