@@ -2,6 +2,10 @@ package com.sputnik.ouidb;
 
 import com.sputnik.ouidb.model.Organization;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
+import org.apache.commons.compress.compressors.bzip2.BZip2Utils;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
+import org.apache.commons.compress.compressors.gzip.GzipUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.CloneCommand;
@@ -11,9 +15,12 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Map;
 
 @Slf4j
@@ -43,16 +50,22 @@ public class Runner {
     }
 
     private void run() throws IOException, GitAPIException {
+        File ouiDBFile = getOuiDBFile();
+
         try (Git git = getGitRepo()) {
             Map<String, Organization> parsedDB = downloader.getParsedDB();
             String json = converter.convertToJson(parsedDB);
-            FileWriter writer = new FileWriter(getOuiDBFile());
+            FileWriter writer = new FileWriter(ouiDBFile);
             IOUtils.write(json, writer);
             writer.flush();
             Status status = git.status().call();
             if (!status.getModified().isEmpty()) {
+                File compressedGzFile = compressFileToGz(ouiDBFile);
+                File compressedBz2File = compressFileToBz2(ouiDBFile);
                 log.info("OUIDB file changed, uploading to git repo.");
-                git.add().addFilepattern(getOuiDBFile().getName()).call();
+                git.add().addFilepattern(ouiDBFile.getName()).call();
+                git.add().addFilepattern(compressedGzFile.getName()).call();
+                git.add().addFilepattern(compressedBz2File.getName()).call();
                 git.commit().setMessage("Updated OUIDB json file").call();
                 git.push().call();
             } else {
@@ -91,5 +104,29 @@ public class Runner {
         }
 
         return git;
+    }
+
+    private File compressFileToGz(File file) {
+        File compressedFile = new File(GzipUtils.getCompressedFilename(file.getAbsolutePath()));
+        try (InputStream in = Files.newInputStream(file.toPath());
+             GzipCompressorOutputStream out = new GzipCompressorOutputStream(new BufferedOutputStream(Files.newOutputStream(compressedFile.toPath())))) {
+            IOUtils.copy(in, out);
+        } catch (IOException e) {
+            log.error("Error compressing file to gz", e);
+        }
+
+        return compressedFile;
+    }
+
+    private File compressFileToBz2(File file) {
+        File compressedFile = new File(BZip2Utils.getCompressedFilename(file.getAbsolutePath()));
+        try (InputStream in = Files.newInputStream(file.toPath());
+             BZip2CompressorOutputStream out = new BZip2CompressorOutputStream(new BufferedOutputStream(Files.newOutputStream(compressedFile.toPath())))) {
+            IOUtils.copy(in, out);
+        } catch (IOException e) {
+            log.error("Error compressing file to bz2", e);
+        }
+
+        return compressedFile;
     }
 }
