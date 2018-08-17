@@ -43,23 +43,23 @@ public class Runner {
     }
 
     private void run() throws IOException, GitAPIException {
-        Git git = getGitRepo();
-
-        Map<String, Organization> parsedDB = downloader.getParsedDB();
-        String json = converter.convertToJson(parsedDB);
-        FileWriter writer = new FileWriter(getOuiDBFile());
-        IOUtils.write(json, writer);
-        writer.flush();
-        Status status = git.status().call();
-        if (!status.getModified().isEmpty()) {
-            log.info("OUIDB file changed, uploading to git repo.");
-            git.add().addFilepattern(getOuiDBFile().getName()).call();
-            git.commit().setMessage("Updated OUIDB json file").call();
-            git.push().call();
-        } else {
-            log.info("No changes detected on OUIDB File, nothing to do.");
+        try (Git git = getGitRepo()) {
+            Map<String, Organization> parsedDB = downloader.getParsedDB();
+            String json = converter.convertToJson(parsedDB);
+            FileWriter writer = new FileWriter(getOuiDBFile());
+            IOUtils.write(json, writer);
+            writer.flush();
+            Status status = git.status().call();
+            if (!status.getModified().isEmpty()) {
+                log.info("OUIDB file changed, uploading to git repo.");
+                git.add().addFilepattern(getOuiDBFile().getName()).call();
+                git.commit().setMessage("Updated OUIDB json file").call();
+                git.push().call();
+            } else {
+                log.info("No changes detected on OUIDB File, nothing to do.");
+            }
         }
-        
+
         log.info("Done :-)");
     }
 
