@@ -1,21 +1,23 @@
 package com.sputnik.ouidb;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sputnik.ouidb.model.OUI;
 import com.sputnik.ouidb.model.Organization;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
 
 public class OUIDBConverter {
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
     public String convertToJson(Map<String, Organization> db) {
-        List<OUI> ouiList = db.entrySet().stream()
+        return db.entrySet().stream()
                 .map(entry -> new OUI(entry.getKey(), entry.getValue()))
                 .sorted(Comparator.comparing(OUI::getPrefix))
-                .collect(Collectors.toList());
-
-        return new GsonBuilder().setPrettyPrinting().create().toJson(ouiList);
+                .collect(collectingAndThen(toList(), gson::toJson));
     }
 }
