@@ -8,11 +8,11 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
+import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.BufferedOutputStream;
@@ -82,6 +82,7 @@ public class Runner {
 
     private Git getGitRepo() throws GitAPIException, IOException {
         Git git;
+        CredentialsProvider.setDefault(getCredentialsProvider());
         if (!dataPath.exists()) {
             log.info("Git repo path does not exists, creating it.");
             dataPath.mkdirs();
@@ -93,14 +94,10 @@ public class Runner {
             git.pull().call();
         } catch (RepositoryNotFoundException e) {
             log.info("Repo does not exists, cloning from {}", repoRemoteUri);
-            CloneCommand cloneCommand = Git.cloneRepository().setDirectory(dataPath).setURI(repoRemoteUri);
-
-            if (StringUtils.isNotBlank(repoUsername) || StringUtils.isNotBlank(repoPassword)) {
-                log.info("Using provided credentials.");
-                cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(repoUsername, repoPassword));
-            }
-
-            git = cloneCommand.call();
+            git = Git.cloneRepository()
+                    .setDirectory(dataPath)
+                    .setURI(repoRemoteUri)
+                    .call();
         }
 
         return git;
@@ -128,5 +125,17 @@ public class Runner {
         }
 
         return compressedFile;
+    }
+
+    private CredentialsProvider getCredentialsProvider() {
+        CredentialsProvider credentialsProvider;
+        if (StringUtils.isNotBlank(repoUsername) || StringUtils.isNotBlank(repoPassword)) {
+            log.info("Using username and password for git repo auth");
+            credentialsProvider = new UsernamePasswordCredentialsProvider(repoUsername, repoPassword);
+        } else {
+            credentialsProvider = CredentialsProvider.getDefault();
+        }
+
+        return credentialsProvider;
     }
 }
