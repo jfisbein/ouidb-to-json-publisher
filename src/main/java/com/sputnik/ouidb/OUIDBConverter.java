@@ -15,7 +15,7 @@ public class OUIDBConverter {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public String convertToJson(Map<String, Organization> db) {
-        return db.entrySet().stream()
+        return db.entrySet().parallelStream()
                 .map(entry -> new OUI(entry.getKey(), entry.getValue()))
                 .sorted(Comparator.comparing(OUI::getPrefix))
                 .collect(collectingAndThen(toList(), gson::toJson));

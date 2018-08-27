@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class OUI {
-    String prefix;
-    Organization organization;
+    private String prefix;
+    private Organization organization;
 }

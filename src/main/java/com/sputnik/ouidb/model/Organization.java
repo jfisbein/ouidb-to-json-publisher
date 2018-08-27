@@ -6,9 +6,7 @@ import java.io.Serializable;
 
 @Data
 public class Organization implements Serializable {
-
     private String name;
-
     private Address address;
 }
 
