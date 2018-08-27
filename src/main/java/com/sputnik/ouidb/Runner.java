@@ -21,12 +21,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Map;
 
 @Slf4j
 public class Runner {
-    private static OUIDBDownloader downloader = new OUIDBDownloader();
-    private static OUIDBConverter converter = new OUIDBConverter();
+    private static final String DEFAULT_FILE_PERMISSIONS = "rw-rw-r--";
+
+    private OUIDBDownloader downloader = new OUIDBDownloader();
+    private OUIDBConverter converter = new OUIDBConverter();
     private File dataPath;
     private String repoRemoteUri;
     private String repoUsername;
@@ -107,6 +110,7 @@ public class Runner {
         File compressedFile = new File(GzipUtils.getCompressedFilename(file.getAbsolutePath()));
         try (InputStream in = Files.newInputStream(file.toPath());
              GzipCompressorOutputStream out = new GzipCompressorOutputStream(new BufferedOutputStream(Files.newOutputStream(compressedFile.toPath())))) {
+            setFilePermissions(compressedFile, DEFAULT_FILE_PERMISSIONS);
             IOUtils.copy(in, out);
         } catch (IOException e) {
             log.error("Error compressing file to gz", e);
@@ -119,6 +123,7 @@ public class Runner {
         File compressedFile = new File(BZip2Utils.getCompressedFilename(file.getAbsolutePath()));
         try (InputStream in = Files.newInputStream(file.toPath());
              BZip2CompressorOutputStream out = new BZip2CompressorOutputStream(new BufferedOutputStream(Files.newOutputStream(compressedFile.toPath())))) {
+            setFilePermissions(compressedFile, DEFAULT_FILE_PERMISSIONS);
             IOUtils.copy(in, out);
         } catch (IOException e) {
             log.error("Error compressing file to bz2", e);
@@ -137,5 +142,9 @@ public class Runner {
         }
 
         return credentialsProvider;
+    }
+
+    private void setFilePermissions(File file, String permissions) throws IOException {
+        Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString(permissions));
     }
 }
