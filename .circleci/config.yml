@@ -36,7 +36,7 @@ jobs:
     - run: mvn integration-test
 
     - store_artifacts:
-        path: /repo/target/ouidb-to-json-publisher-jar-with-dependencies.jar
+        path: target/ouidb-to-json-publisher-jar-with-dependencies.jar
 
     - store_test_results:
-        path: /repo/target/surefire-reports
+        path: target/surefire-reports
