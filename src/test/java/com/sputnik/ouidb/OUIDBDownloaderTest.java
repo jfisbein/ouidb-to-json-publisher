@@ -17,7 +17,7 @@ class OUIDBDownloaderTest {
         Map<String, Organization> db = new OUIDBDownloader().parseDb(new FileReader("src/test/resources/ouidb-test.txt"));
 
         // All OUI parsed
-        assertEquals(8, db.size(), "Missing some OUIs from parsed result");
+        assertEquals(9, db.size(), "Missing some OUIs from parsed result");
 
         // Private
         testOUI(db, "E4F14C", "Private", null, null, null);
@@ -31,6 +31,7 @@ class OUIDBDownloaderTest {
         testOUI(db, "001E61", "ITEC GmbH", "Lassnitzthal 300", "A-8200  Gleisdorf", "AT");
         testOUI(db, "000037", "Oxford Metrics Limited", "Unit 8, 7 West Way", "United  Kingdom", "GB");
         testOUI(db, "1CB044", "Askey Computer Corp", "10F, No.119, JIANKANG Rd, ZHONGHE DIST", "NEW Taipei  Taiwan  23585", "TW");
+        testOUI(db, "900372", "Longnan Junya Digital Technology Co. Ltd", "Champion Asia Road, Xinzhen industrial Park, Longnan national economic and technological development zone, Ganzhou city, JiangXi Province, China", "ganzhou  jiangxi  341700", "CN");
 
         // No addressLine 2
         testOUI(db, "000057", "Scitex Corporation Ltd", "P.O. Box 330", null, "IL");

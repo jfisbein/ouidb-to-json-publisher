@@ -42,3 +42,9 @@ E4F14C     (base 16)		Private
 				10F,No.119,JIANKANG Rd,ZHONGHE DIST
 				NEW Taipei  Taiwan  23585
 				TW
+
+90-03-72   (hex)		Longnan Junya Digital Technology Co. Ltd
+900372     (base 16)		Longnan Junya Digital Technology Co. Ltd
+				Champion Asia Road, Xinzhen industrial Park, Longnan national economic and technological development zone, Ganzhou city, JiangXi Province , China
+				ganzhou  jiangxi  341700
+				CN

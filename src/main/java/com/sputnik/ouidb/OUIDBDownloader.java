@@ -137,6 +137,9 @@ public class OUIDBDownloader {
             // Add space after ',' if missing
             normalizedText = RegExUtils.replaceAll(normalizedText, "\\,(\\w{1})", ", $1");
 
+            // Remove space before ',' if present
+            normalizedText = RegExUtils.replaceAll(normalizedText, " \\,", ",");
+
             normalizedText = normalizedText.trim();
             while (normalizedText.contains("   ")) {
                 normalizedText = StringUtils.replace(normalizedText, "   ", "  ");
