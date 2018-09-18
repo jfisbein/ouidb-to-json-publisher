@@ -47,7 +47,7 @@ public class Runner {
             log.error("Expected four arguments");
             log.error("Usage java -jar ouidb-to-json-publisher.jar {DATA_FOLDER} {REMOTE_REPO_URI} {REMOTE_REPO_USERNAME} {REMOTE_REPO_PASSWORD}");
         } else {
-            log.info("Running with {} {} {} {}", args);
+            log.info("Running with {} {} {} {}", (Object[]) args);
             new Runner(new File(args[0]), args[1], args[2], args[3]).run();
         }
     }
