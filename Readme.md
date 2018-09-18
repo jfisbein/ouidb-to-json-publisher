@@ -1,4 +1,5 @@
 # oui-to-json-publisher
+[![CircleCI](https://circleci.com/gh/jfisbein/ouidb-to-json-publisher.svg?style=svg)](https://circleci.com/gh/jfisbein/ouidb-to-json-publisher)
 
 Simple tool that does the following steps:
 
