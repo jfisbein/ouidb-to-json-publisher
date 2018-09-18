@@ -82,7 +82,7 @@ public class OUIDBDownloader {
         return result;
     }
 
-    private Map<String, Organization> parseDb(Reader db) throws IOException {
+    protected Map<String, Organization> parseDb(Reader db) throws IOException {
         Map<String, Organization> response = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
         try (BufferedReader reader = new BufferedReader(db)) {
@@ -90,18 +90,19 @@ public class OUIDBDownloader {
             int counter = 0;
             Organization organization = null;
             while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.contains("(base 16)")) {
-                    String[] split = StringUtils.splitByWholeSeparator(line, "(base 16)");
-                    String prefix = split[0].trim();
-                    String organizationName = split[1].trim();
-                    counter = 0;
-                    organization = new Organization();
-                    organization.setName(organizationName);
-                    organization.setAddress(new Address());
-                    response.put(prefix, organization);
-                } else if (counter < 3 && organization != null) {
-                    counter = fillAddress(line, counter, organization);
+                line = normalize(line);
+                if (!line.isEmpty()) {
+                    if (line.contains("(hex)")) {
+                        String[] split = StringUtils.splitByWholeSeparator(line, "(hex)");
+                        String prefix = split[0].trim().replace("-", "");
+                        String organizationName = split[1].trim();
+                        counter = 0;
+                        organization = new Organization(organizationName);
+                        organization.setAddress(new Address());
+                        response.put(prefix, organization);
+                    } else if (counter < 3 && organization != null && !line.contains("(base 16)")) {
+                        counter = fillAddress(line, counter, organization.getAddress());
+                    }
                 }
             }
         }
@@ -113,17 +114,30 @@ public class OUIDBDownloader {
         return response;
     }
 
-    private int fillAddress(String line, int counter, Organization organization) {
+    private int fillAddress(String line, int counter, Address address) {
         if (counter == 0) {
-            organization.getAddress().setLine1(line);
+            address.setLine1(line);
             counter++;
         } else if (counter == 1) {
-            organization.getAddress().setLine2(line);
+            address.setLine2(line);
             counter++;
         } else if (counter == 2) {
-            organization.getAddress().setCountryCode(line);
+            address.setCountryCode(line);
             counter++;
         }
         return counter;
+    }
+
+    private String normalize(String text) {
+        String normalizedText = null;
+        if (text != null) {
+            normalizedText = text.trim();
+            normalizedText = StringUtils.removeEnd(normalizedText, ",");
+            normalizedText = StringUtils.replace(normalizedText, ",.Ltd", ". Ltd");
+
+            normalizedText = normalizedText.trim();
+        }
+
+        return normalizedText;
     }
 }

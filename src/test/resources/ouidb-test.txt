@@ -1,0 +1,27 @@
+00-09-3A   (hex)		Molex CMS
+00093A     (base 16)		Molex CMS
+				5224 Katrine Avenue
+				Downers Grove  IL  60515
+				US
+
+E4-F1-4C   (hex)		Private
+E4F14C     (base 16)		Private
+
+18-BB-26   (hex)		FN-Link Technology Limited
+18BB26     (base 16)		FN-Link Technology Limited
+				A Building,HuiXin industial park,No 31, YongHe road, Fuyong town, Bao'an District
+				Shenzhen  Guangdong  518100
+				CN
+
+00-1F-18   (hex)		Hakusan.Mfg.Co,.Ltd
+001F18     (base 16)		Hakusan.Mfg.Co,.Ltd
+				Tomin-Kougyou-Ikebukuro BLD.5F
+				Tosima Ward  Tokyo-Met.  171-0022
+				JP
+
+00-1E-61   (hex)		ITEC GmbH
+001E61     (base 16)		ITEC GmbH
+				Lassnitzthal 300
+				  A-8200   Gleisdorf
+				AT
+
