@@ -127,12 +127,12 @@ public class OUIDBDownloader {
         return counter;
     }
 
-    private String normalize(String text) {
+    protected String normalize(String text) {
         String normalizedText = null;
         if (text != null) {
             normalizedText = text.trim();
             normalizedText = StringUtils.removeEnd(normalizedText, ",");
-            normalizedText = StringUtils.replace(normalizedText, ",.Ltd", ". Ltd");
+            normalizedText = StringUtils.replaceIgnoreCase(normalizedText, ",.Ltd", ". Ltd");
 
             // Add space after ',' if missing
             normalizedText = RegExUtils.replaceAll(normalizedText, "\\,(\\w{1})", ", $1");

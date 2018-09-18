@@ -42,6 +42,27 @@ class OUIDBDownloaderTest {
         assertThrows(NoRecordsFoundException.class, () -> new OUIDBDownloader().parseDb(new FileReader("src/test/resources/ouidb-empty.txt")));
     }
 
+    @Test
+    void normalize() {
+        OUIDBDownloader downloader = new OUIDBDownloader();
+        assertEquals(null, downloader.normalize(null));
+        assertEquals("", downloader.normalize(""));
+        assertEquals("", downloader.normalize(" "));
+        assertEquals("ABC", downloader.normalize("ABC"));
+        assertEquals("ABC", downloader.normalize(" ABC "));
+        assertEquals("ABC", downloader.normalize(" ABC ,"));
+        assertEquals("ABC, DEF", downloader.normalize("ABC,DEF"));
+        assertEquals("ABC, DEF", downloader.normalize("ABC, DEF"));
+        assertEquals("ABC, DEF", downloader.normalize("ABC , DEF"));
+        assertEquals("ABC. Ltd", downloader.normalize("ABC,.Ltd"));
+        assertEquals("ABC. Ltd", downloader.normalize("ABC,.ltd"));
+        assertEquals("ABC DEF", downloader.normalize("ABC DEF"));
+        assertEquals("ABC  DEF", downloader.normalize("ABC  DEF"));
+        assertEquals("ABC  DEF", downloader.normalize("ABC   DEF"));
+        assertEquals("ABC  DEF", downloader.normalize("ABC    DEF"));
+        assertEquals("ABC  DEF", downloader.normalize(" ABC    DEF "));
+    }
+
     private void testOUI(Map<String, Organization> db, String prefix, String name, String addressLine1, String addressLine2, String countryCode) {
         assertNotNull(db.get(prefix));
         assertEquals(name, db.get(prefix).getName());
