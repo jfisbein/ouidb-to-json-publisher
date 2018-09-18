@@ -25,3 +25,8 @@ E4F14C     (base 16)		Private
 				  A-8200   Gleisdorf
 				AT
 
+00-00-57   (hex)		Scitex Corporation Ltd
+000057     (base 16)		Scitex Corporation Ltd
+				P.O. Box 330
+
+				IL

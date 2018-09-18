@@ -91,18 +91,16 @@ public class OUIDBDownloader {
             Organization organization = null;
             while ((line = reader.readLine()) != null) {
                 line = normalize(line);
-                if (!line.isEmpty()) {
-                    if (line.contains("(hex)")) {
-                        String[] split = StringUtils.splitByWholeSeparator(line, "(hex)");
-                        String prefix = split[0].trim().replace("-", "");
-                        String organizationName = split[1].trim();
-                        counter = 0;
-                        organization = new Organization(organizationName);
-                        organization.setAddress(new Address());
-                        response.put(prefix, organization);
-                    } else if (counter < 3 && organization != null && !line.contains("(base 16)")) {
-                        counter = fillAddress(line, counter, organization.getAddress());
-                    }
+                if (line.contains("(hex)")) {
+                    String[] split = StringUtils.splitByWholeSeparator(line, "(hex)");
+                    String prefix = split[0].trim().replace("-", "");
+                    String organizationName = split[1].trim();
+                    counter = 0;
+                    organization = new Organization(organizationName);
+                    organization.setAddress(new Address());
+                    response.put(prefix, organization);
+                } else if (counter < 3 && organization != null && !line.contains("(base 16)")) {
+                    counter = fillAddress(line, counter, organization.getAddress());
                 }
             }
         }
@@ -116,13 +114,13 @@ public class OUIDBDownloader {
 
     private int fillAddress(String line, int counter, Address address) {
         if (counter == 0) {
-            address.setLine1(line);
+            address.setLine1(StringUtils.trimToNull(line));
             counter++;
         } else if (counter == 1) {
-            address.setLine2(line);
+            address.setLine2(StringUtils.trimToNull(line));
             counter++;
         } else if (counter == 2) {
-            address.setCountryCode(line);
+            address.setCountryCode(StringUtils.trimToNull(line));
             counter++;
         }
         return counter;

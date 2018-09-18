@@ -16,7 +16,8 @@ class OUIDBDownloaderTest {
     void parsedDB() throws IOException {
         Map<String, Organization> db = new OUIDBDownloader().parseDb(new FileReader("src/test/resources/ouidb-test.txt"));
 
-        assertEquals(5, db.size());
+        // All OUI parsed
+        assertEquals(6, db.size(), "Missing some OUI from parsed result");
 
         // Private
         testOUI(db, "E4F14C", "Private", null, null, null);
@@ -28,6 +29,7 @@ class OUIDBDownloaderTest {
         testOUI(db, "001F18", "Hakusan.Mfg.Co. Ltd", "Tomin-Kougyou-Ikebukuro BLD.5F", "Tosima Ward  Tokyo-Met.  171-0022", "JP");
         testOUI(db, "001E61", "ITEC GmbH", "Lassnitzthal 300", "A-8200   Gleisdorf", "AT");
 
+        testOUI(db, "000057", "Scitex Corporation Ltd", "P.O. Box 330", null, "IL");
     }
 
     @Test
