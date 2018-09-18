@@ -21,11 +21,11 @@ docker run -e "REPO_URL={THE_REPO_TO_UPLOAD_THE_JSON_FILE}" \
  ```
  
  ##### Example
-For github:
+For GitHub:
  ```
 docker run -e "REPO_URL=https://github.com/jfisbein/ouidb-json" \
  -e "REPO_USERNAME={YOUR_GITHUB_USER_TOKEN}" \
  jfisbein/ouidb-to-json-publisher
  
  ```
- note: on github when using a github user token you don't have to set the password.
+ note: on GitHub, when using a GitHub user token, you don't have to set the password.

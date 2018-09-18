@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
 public class OUIDBConverter {
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public String convertToJson(Map<String, Organization> db) {
         return db.entrySet().parallelStream()
