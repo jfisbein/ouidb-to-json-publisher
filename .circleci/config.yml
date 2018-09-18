@@ -39,4 +39,4 @@ jobs:
         path: target/ouidb-to-json-publisher-jar-with-dependencies.jar
 
     - store_test_results:
-        path: target/surefire-reports
+        path: target
