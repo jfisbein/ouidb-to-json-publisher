@@ -17,18 +17,22 @@ class OUIDBDownloaderTest {
         Map<String, Organization> db = new OUIDBDownloader().parseDb(new FileReader("src/test/resources/ouidb-test.txt"));
 
         // All OUI parsed
-        assertEquals(6, db.size(), "Missing some OUI from parsed result");
+        assertEquals(8, db.size(), "Missing some OUIs from parsed result");
 
         // Private
         testOUI(db, "E4F14C", "Private", null, null, null);
+
         // Normal
         testOUI(db, "00093A", "Molex CMS", "5224 Katrine Avenue", "Downers Grove  IL  60515", "US");
-        testOUI(db, "18BB26", "FN-Link Technology Limited", "A Building,HuiXin industial park,No 31, YongHe road, Fuyong town, Bao'an District", "Shenzhen  Guangdong  518100", "CN");
+        testOUI(db, "18BB26", "FN-Link Technology Limited", "A Building, HuiXin industial park, No 31, YongHe road, Fuyong town, Bao'an District", "Shenzhen  Guangdong  518100", "CN");
 
         // Normalize
         testOUI(db, "001F18", "Hakusan.Mfg.Co. Ltd", "Tomin-Kougyou-Ikebukuro BLD.5F", "Tosima Ward  Tokyo-Met.  171-0022", "JP");
-        testOUI(db, "001E61", "ITEC GmbH", "Lassnitzthal 300", "A-8200   Gleisdorf", "AT");
+        testOUI(db, "001E61", "ITEC GmbH", "Lassnitzthal 300", "A-8200  Gleisdorf", "AT");
+        testOUI(db, "000037", "Oxford Metrics Limited", "Unit 8, 7 West Way", "United  Kingdom", "GB");
+        testOUI(db, "1CB044", "Askey Computer Corp", "10F, No.119, JIANKANG Rd, ZHONGHE DIST", "NEW Taipei  Taiwan  23585", "TW");
 
+        // No addressLine 2
         testOUI(db, "000057", "Scitex Corporation Ltd", "P.O. Box 330", null, "IL");
     }
 

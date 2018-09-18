@@ -5,6 +5,7 @@ import com.sputnik.ouidb.exception.NoRecordsFoundException;
 import com.sputnik.ouidb.model.Address;
 import com.sputnik.ouidb.model.Organization;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.client.entity.GzipDecompressingEntity;
@@ -133,7 +134,13 @@ public class OUIDBDownloader {
             normalizedText = StringUtils.removeEnd(normalizedText, ",");
             normalizedText = StringUtils.replace(normalizedText, ",.Ltd", ". Ltd");
 
+            // Add space after ',' if missing
+            normalizedText = RegExUtils.replaceAll(normalizedText, "\\,(\\w{1})", ", $1");
+
             normalizedText = normalizedText.trim();
+            while (normalizedText.contains("   ")) {
+                normalizedText = StringUtils.replace(normalizedText, "   ", "  ");
+            }
         }
 
         return normalizedText;
