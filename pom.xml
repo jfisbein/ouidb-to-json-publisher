@@ -6,7 +6,7 @@
 
     <groupId>com.sputnik</groupId>
     <artifactId>ouidb-to-json-publisher</artifactId>
-    <version>1.3.0-SNAPSHOT</version>
+    <version>1.3.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
