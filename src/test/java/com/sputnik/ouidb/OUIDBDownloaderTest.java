@@ -43,6 +43,25 @@ class OUIDBDownloaderTest {
     }
 
     @Test
+    public void testUnknownHostUrl() {
+        assertThrows(NoRecordsFoundException.class, () ->
+                new OUIDBDownloader("http://thisurldoes.not.exists").getParsedDB());
+    }
+
+    @Test
+    public void testWrongUrl() {
+        assertThrows(NoRecordsFoundException.class, () ->
+                new OUIDBDownloader("http://www.google.com").getParsedDB());
+    }
+
+    @Test
+    public void testWrongAndGoodUrl() throws IOException {
+        Map<String, Organization> parsedDB = new OUIDBDownloader(new String[]{"http://thisurldoes.not.exists", "https://linuxnet.ca/ieee/oui.txt.bz2"}).getParsedDB();
+        assertNotNull(parsedDB);
+        assertFalse(parsedDB.isEmpty());
+    }
+
+    @Test
     void normalize() {
         OUIDBDownloader downloader = new OUIDBDownloader();
         assertEquals(null, downloader.normalize(null));
