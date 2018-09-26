@@ -1,5 +1,5 @@
 # base build image
-FROM maven:3.5-jdk-8 as maven
+FROM maven:3.5-jdk-11 as maven
 
 # copy the project files
 COPY ./pom.xml ./pom.xml
@@ -14,8 +14,9 @@ COPY ./src ./src
 RUN mvn clean package --batch-mode
 
 # final base image
-FROM openjdk:8-jre-alpine
+#FROM openjdk:8-jre-alpine
+FROM openjdk:11-jre-slim
 
 COPY --from=maven target/ouidb-to-json-publisher-jar-with-dependencies.jar /
 
-ENTRYPOINT ["sh", "-c", "java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -jar /ouidb-to-json-publisher-jar-with-dependencies.jar '/var/data' \"${REPO_URL}\" \"${REPO_USERNAME}\" \"${REPO_PASSWORD}\""]
+ENTRYPOINT ["sh", "-c", "java -jar /ouidb-to-json-publisher-jar-with-dependencies.jar '/var/data' \"${REPO_URL}\" \"${REPO_USERNAME}\" \"${REPO_PASSWORD}\""]
