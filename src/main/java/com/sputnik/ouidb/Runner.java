@@ -43,16 +43,20 @@ public class Runner {
     }
 
     public static void main(String[] args) throws Exception {
+        ExitCode exitCode;
         if (args.length != 4) {
             log.error("Expected four arguments");
             log.error("Usage java -jar ouidb-to-json-publisher.jar {DATA_FOLDER} {REMOTE_REPO_URI} {REMOTE_REPO_USERNAME} {REMOTE_REPO_PASSWORD}");
+            exitCode = ExitCode.PARAMS_ERROR;
         } else {
             log.info("Running with {} {} {} {}", (Object[]) args);
-            new Runner(new File(args[0]), args[1], args[2], args[3]).run();
+            exitCode = new Runner(new File(args[0]), args[1], args[2], args[3]).run();
         }
+        System.exit(exitCode.getCode());
     }
 
-    private void run() throws IOException, GitAPIException {
+    private ExitCode run() throws IOException, GitAPIException {
+        ExitCode exitCode;
         File ouiDBFile = getOuiDBFile();
 
         try (Git git = getGitRepo()) {
@@ -63,6 +67,7 @@ public class Runner {
             writer.flush();
             Status status = git.status().call();
             if (!status.getModified().isEmpty()) {
+                exitCode = ExitCode.THERES_CHANGES;
                 File compressedGzFile = compressFileToGz(ouiDBFile);
                 File compressedBz2File = compressFileToBz2(ouiDBFile);
                 log.info("OUIDB file changed, uploading to git repo.");
@@ -72,11 +77,13 @@ public class Runner {
                 git.commit().setMessage("Updated OUIDB json file").call();
                 git.push().call();
             } else {
+                exitCode = ExitCode.NO_CHANGES;
                 log.info("No changes detected on OUIDB File, nothing to do.");
             }
         }
 
         log.info("Done :-)");
+        return exitCode;
     }
 
     private File getOuiDBFile() {
