@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.GzipDecompressingEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -22,6 +23,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 /**
@@ -63,10 +65,11 @@ public class OUIDBDownloader {
             try (CloseableHttpClient cachingClient = HttpClientBuilder.create().build()) {
                 HttpGet httpget = new HttpGet(ouiDbUrl);
                 CloseableHttpResponse response = cachingClient.execute(httpget);
-                Header[] contentTypeHeaders = response.getHeaders("Content-Type");
-                if (contentTypeHeaders != null && contentTypeHeaders.length > 0 && contentTypeHeaders[0].getValue().equalsIgnoreCase("application/x-gzip")) {
+                String contentTypeHeader = getContentTypeHeader(response).orElse("text/plain; charset=utf-8");
+
+                if (contentTypeHeader.equalsIgnoreCase("application/x-gzip")) {
                     result = new StringReader(EntityUtils.toString(new GzipDecompressingEntity(response.getEntity())));
-                } else if (contentTypeHeaders != null && contentTypeHeaders.length > 0 && contentTypeHeaders[0].getValue().equalsIgnoreCase("application/x-bzip2")) {
+                } else if (contentTypeHeader.equalsIgnoreCase("application/x-bzip2")) {
                     result = new StringReader(EntityUtils.toString(new Bz2DecompressingEntity(response.getEntity())));
                 } else {
                     result = new StringReader(EntityUtils.toString(response.getEntity()));
@@ -81,6 +84,16 @@ public class OUIDBDownloader {
         }
 
         return result;
+    }
+
+    private Optional<String> getContentTypeHeader(HttpResponse response) {
+        String headerValue = null;
+        Header[] contentTypeHeaders = response.getHeaders("Content-Type");
+        if (contentTypeHeaders != null && contentTypeHeaders.length > 0) {
+            headerValue = contentTypeHeaders[0].getValue();
+        }
+
+        return Optional.ofNullable(headerValue);
     }
 
     protected Map<String, Organization> parseDb(Reader db) throws IOException {

@@ -10,12 +10,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>10</maven.compiler.source>
+        <maven.compiler.target>10</maven.compiler.target>
     </properties>
 
     <prerequisites>
-        <maven>3.0.5</maven>
+        <maven>3.5.2</maven>
     </prerequisites>
 
     <dependencyManagement>
@@ -36,6 +36,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.2</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -120,7 +121,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <!-- MainClass in mainfest make a executable jar -->
+                    <!-- MainClass in manifest make a executable jar -->
                     <archive>
                         <manifest>
                             <mainClass>com.sputnik.ouidb.Runner</mainClass>
@@ -144,6 +145,12 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.1</version>
             </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -158,7 +165,7 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <version>3.0.5</version>
+                                    <version>3.5.2</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>

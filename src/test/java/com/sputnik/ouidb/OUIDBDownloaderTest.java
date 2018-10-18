@@ -2,13 +2,17 @@ package com.sputnik.ouidb;
 
 import com.sputnik.ouidb.exception.NoRecordsFoundException;
 import com.sputnik.ouidb.model.Organization;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class OUIDBDownloaderTest {
 
@@ -43,19 +47,19 @@ class OUIDBDownloaderTest {
     }
 
     @Test
-    public void testUnknownHostUrl() {
+    void testUnknownHostUrl() {
         assertThrows(NoRecordsFoundException.class, () ->
                 new OUIDBDownloader("http://thisurldoes.not.exists").getParsedDB());
     }
 
     @Test
-    public void testWrongUrl() {
+    void testWrongUrl() {
         assertThrows(NoRecordsFoundException.class, () ->
                 new OUIDBDownloader("http://www.google.com").getParsedDB());
     }
 
     @Test
-    public void testWrongAndGoodUrl() throws IOException {
+    void testWrongAndGoodUrl() throws IOException {
         Map<String, Organization> parsedDB = new OUIDBDownloader(new String[]{"http://thisurldoes.not.exists", "https://linuxnet.ca/ieee/oui.txt.bz2"}).getParsedDB();
         assertNotNull(parsedDB);
         assertFalse(parsedDB.isEmpty());
@@ -64,7 +68,7 @@ class OUIDBDownloaderTest {
     @Test
     void normalize() {
         OUIDBDownloader downloader = new OUIDBDownloader();
-        assertEquals(null, downloader.normalize(null));
+        assertNull(downloader.normalize(null));
         assertEquals("", downloader.normalize(""));
         assertEquals("", downloader.normalize(" "));
         assertEquals("ABC", downloader.normalize("ABC"));
