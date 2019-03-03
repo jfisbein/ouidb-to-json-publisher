@@ -6,47 +6,59 @@ version: 2
 jobs:
   build:
     docker:
-    # specify the version you desire here
-    - image: circleci/openjdk:11-jdk
+      # specify the version you desire here
+      - image: circleci/openjdk:11-jdk
 
     working_directory: ~/repo
 
     environment:
       # Customize the JVM maximum heap limit
       MAVEN_OPTS: -Xmx3200m
+      CC_TEST_REPORTER_ID: a3c65f2649b4c95aabc143bb9abef0aa6dbc2dbc6fbf01f8d6e24ea9b68ca11d
 
     steps:
-    - checkout
+      - checkout
 
-    # Download and cache dependencies
-    - restore_cache:
-        keys:
-        - v1-dependencies-{{ checksum "pom.xml" }}
-        # fallback to using the latest cache if no exact match is found
-        - v1-dependencies-
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pom.xml" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
 
-    - run: mvn dependency:go-offline
+      - run: mvn dependency:go-offline
 
-    - save_cache:
-        paths:
-        - ~/.m2
-        key: v1-dependencies-{{ checksum "pom.xml" }}
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "pom.xml" }}
 
-    # run tests!
-    - run: mvn integration-test
+      # run tests!
+      - run:
+          name: Setup Code Climate test-reporter
+          command: |
+            # download test reporter as a static binary
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
 
-    - run:
-        name: Save test results
-        command: |
+      - run:
+          name: Run tests
+          command: |
+            ./cc-test-reporter before-build
+            mvn integration-test
+            ./cc-test-reporter after-build --coverage-input-type jacoco --exit-code $?
+      - run:
+          name: Save test results
+          command: |
             mkdir -p ~/junit/
             find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/junit/ \;
-        when: always
+          when: always
 
-    - store_test_results:
-        path: ~/junit
+      - store_test_results:
+          path: ~/junit
 
-    - store_artifacts:
-        path: ~/junit
+      - store_artifacts:
+          path: ~/junit
 
-    - store_artifacts:
-        path: target/ouidb-to-json-publisher-jar-with-dependencies.jar
+      - store_artifacts:
+          path: target/ouidb-to-json-publisher-jar-with-dependencies.jar
