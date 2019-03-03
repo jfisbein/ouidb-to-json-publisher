@@ -46,7 +46,7 @@ jobs:
           command: |
             ./cc-test-reporter before-build
             mvn integration-test
-            ./cc-test-reporter after-build --debug --coverage-input-type jacoco --exit-code --prefix "./target" $?
+            ./cc-test-reporter after-build --debug --coverage-input-type jacoco --prefix "./target" --exit-code $?
       - run:
           name: Save test results
           command: |
