@@ -47,7 +47,7 @@ jobs:
             ./cc-test-reporter before-build
             mvn integration-test
             cp target/site/jacoco/jacoco.xml .
-            ./cc-test-reporter after-build --debug --coverage-input-type jacoco --exit-code $?
+            JACOCO_SOURCE_PATH="src/main/java" ./cc-test-reporter after-build --debug --coverage-input-type jacoco --exit-code $?
       - run:
           name: Save test results
           command: |
