@@ -46,7 +46,8 @@ jobs:
           command: |
             ./cc-test-reporter before-build
             mvn integration-test
-            ./cc-test-reporter after-build --debug --coverage-input-type jacoco --prefix "/home/circleci/repo/target" --exit-code $?
+            cp target/jacoco* .
+            ./cc-test-reporter after-build --debug --coverage-input-type jacoco --exit-code $?
       - run:
           name: Save test results
           command: |
