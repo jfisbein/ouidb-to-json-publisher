@@ -58,7 +58,7 @@ jobs:
       - run:
           name: Run Sonar analisis
           command: |
-            mvn clean package sonar:sonar \                                                                                                                                16:01:26 
+            mvn clean package sonar:sonar \
               -Dsonar.projectKey=jfisbein_ouidb-to-json-publisher \
               -Dsonar.organization=jfisbein-github \
               -Dsonar.host.url=https://sonarcloud.io \
