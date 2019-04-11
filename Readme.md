@@ -1,5 +1,5 @@
 # oui-to-json-publisher
-[![CircleCI](https://circleci.com/gh/jfisbein/ouidb-to-json-publisher.svg?style=svg)](https://circleci.com/gh/jfisbein/ouidb-to-json-publisher)
+[![CircleCI](https://circleci.com/gh/jfisbein/ouidb-to-json-publisher.svg?style=svg)](https://circleci.com/gh/jfisbein/ouidb-to-json-publisher) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jfisbein_ouidb-to-json-publisher&metric=alert_status)](https://sonarcloud.io/dashboard?id=jfisbein_ouidb-to-json-publisher)
 
 Simple tool that does the following steps:
 

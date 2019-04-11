@@ -14,7 +14,6 @@ jobs:
     environment:
       # Customize the JVM maximum heap limit
       MAVEN_OPTS: -Xmx3200m
-      CC_TEST_REPORTER_ID: a3c65f2649b4c95aabc143bb9abef0aa6dbc2dbc6fbf01f8d6e24ea9b68ca11d
 
     steps:
       - checkout
@@ -45,15 +44,25 @@ jobs:
           name: Run tests
           command: |
             ./cc-test-reporter before-build
-            mvn integration-test
+            mvn test integration-test
             cp target/site/jacoco/jacoco.xml .
             JACOCO_SOURCE_PATH="src/main/java" ./cc-test-reporter after-build --debug --coverage-input-type jacoco --exit-code $?
+
       - run:
           name: Save test results
           command: |
             mkdir -p ~/junit/
             find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/junit/ \;
           when: always
+
+      - run:
+          name: Run Sonar analisis
+          command: |
+            mvn clean package sonar:sonar \                                                                                                                                16:01:26 
+              -Dsonar.projectKey=jfisbein_ouidb-to-json-publisher \
+              -Dsonar.organization=jfisbein-github \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.login=$SONARQUBE_LOGIN
 
       - store_test_results:
           path: ~/junit
