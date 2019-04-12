@@ -1,5 +1,7 @@
 # oui-to-json-publisher
-[![CircleCI](https://circleci.com/gh/jfisbein/ouidb-to-json-publisher.svg?style=svg)](https://circleci.com/gh/jfisbein/ouidb-to-json-publisher) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jfisbein_ouidb-to-json-publisher&metric=alert_status)](https://sonarcloud.io/dashboard?id=jfisbein_ouidb-to-json-publisher)
+[![CircleCI](https://circleci.com/gh/jfisbein/ouidb-to-json-publisher.svg?style=svg)](https://circleci.com/gh/jfisbein/ouidb-to-json-publisher)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jfisbein_ouidb-to-json-publisher&metric=alert_status)](https://sonarcloud.io/dashboard?id=jfisbein_ouidb-to-json-publisher)
+[![](https://images.microbadger.com/badges/image/jfisbein/ouidb-to-json-publisher.svg)](https://microbadger.com/images/jfisbein/ouidb-to-json-publisher "Get your own image badge on microbadger.com")
 
 Simple tool that does the following steps:
 
