@@ -1,17 +1,18 @@
+# syntax = docker/dockerfile:1.0-experimental
 # base build image
-FROM maven:3.5-jdk-11 as maven
+FROM maven:3.6-jdk-11 as maven
 
 # copy the project files
 COPY ./pom.xml ./pom.xml
 
 # build all dependencies
-RUN mvn dependency:go-offline --batch-mode
+RUN --mount=type=cache,target=/root/.m2 mvn dependency:go-offline --batch-mode
 
 # copy source files
 COPY ./src ./src
 
 # build for release
-RUN mvn clean package --batch-mode
+RUN --mount=type=cache,target=/root/.m2 mvn package --batch-mode
 
 # final base image
 #FROM openjdk:8-jre-alpine
