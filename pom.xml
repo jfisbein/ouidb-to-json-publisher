@@ -8,6 +8,12 @@
     <artifactId>ouidb-to-json-publisher</artifactId>
     <version>1.4.7</version>
 
+    <url>https://github.com/jfisbein/ouidb-to-json-publisher</url>
+    <scm>
+        <url>https://github.com/jfisbein/ouidb-to-json-publisher</url>
+        <developerConnection>git@github.com:jfisbein/ouidb-to-json-publisher.git</developerConnection>
+    </scm>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
