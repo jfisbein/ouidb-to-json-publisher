@@ -1,30 +1,29 @@
 package com.sputnik.ouidb;
 
-import com.sputnik.ouidb.entity.Bz2DecompressingEntity;
 import com.sputnik.ouidb.exception.NoRecordsFoundException;
 import com.sputnik.ouidb.model.Address;
 import com.sputnik.ouidb.model.Organization;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Cache;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.entity.GzipDecompressingEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Simple utility class to parse the latestOUI DB and parse it as case insensitive a Map.<br>
@@ -40,6 +39,7 @@ import java.util.TreeMap;
 @Slf4j
 public class OUIDBDownloader {
 
+    public static final int TEN_MB = 10 * 1024 * 1024;
     private String[] ouiDbUrls = new String[]{"https://linuxnet.ca/ieee/oui.txt.bz2", "https://linuxnet.ca/ieee/oui.txt.gz", "https://linuxnet.ca/ieee/oui.txt"};
 
     public OUIDBDownloader() {}
@@ -56,29 +56,33 @@ public class OUIDBDownloader {
         return parseDb(download());
     }
 
-    protected Reader download() {
+    public Reader download() {
+        Cache cache = new Cache(new File(System.getProperty("java.io.tmpdir")), TEN_MB);
+        OkHttpClient client = new OkHttpClient.Builder().cache(cache).build();
         Reader result = null;
-        Iterator<String> url = Arrays.asList(ouiDbUrls).iterator();
-        while (result == null && url.hasNext()) {
-            String ouiDbUrl = url.next();
-            log.info("Downloading OUIs DB from {}", ouiDbUrl);
-            try (CloseableHttpClient cachingClient = HttpClientBuilder.create().build()) {
-                HttpGet httpget = new HttpGet(ouiDbUrl);
-                CloseableHttpResponse response = cachingClient.execute(httpget);
-                String contentTypeHeader = getContentTypeHeader(response).orElse("text/plain; charset=utf-8");
+        Iterator<String> urlIterator = Arrays.asList(ouiDbUrls).iterator();
+        while (result == null && urlIterator.hasNext()) {
+            String ouiDbUrl = urlIterator.next();
+            Request request = new Request.Builder()
+                    .url(ouiDbUrl)
+                    .build();
 
-                if (contentTypeHeader.equalsIgnoreCase("application/x-gzip")) {
-                    result = new StringReader(EntityUtils.toString(new GzipDecompressingEntity(response.getEntity())));
-                } else if (contentTypeHeader.equalsIgnoreCase("application/x-bzip2")) {
-                    result = new StringReader(EntityUtils.toString(new Bz2DecompressingEntity(response.getEntity())));
-                } else {
-                    result = new StringReader(EntityUtils.toString(response.getEntity()));
+            try {
+                Response response = client.newCall(request).execute();
+                if (response.body() != null) {
+                    String contentTypeHeader = getContentTypeHeader(response).orElse("text/plain; charset=utf-8");
+                    if (contentTypeHeader.equalsIgnoreCase("application/x-gzip")) {
+                        result = new InputStreamReader(new GZIPInputStream(response.body().byteStream()));
+                    } else if (contentTypeHeader.equalsIgnoreCase("application/x-bzip2")) {
+                        result = new InputStreamReader(new BZip2CompressorInputStream(response.body().byteStream()));
+                    } else {
+                        result = response.body().charStream();
+                    }
                 }
             } catch (IOException e) {
                 log.warn("Error downloading OUIs from {} - {}: {}", ouiDbUrl, e.getClass().getSimpleName(), e.getMessage());
             }
         }
-
         if (result == null) {
             throw new NoRecordsFoundException("No records found");
         }
@@ -86,11 +90,11 @@ public class OUIDBDownloader {
         return result;
     }
 
-    private Optional<String> getContentTypeHeader(HttpResponse response) {
+    private Optional<String> getContentTypeHeader(Response response) {
         String headerValue = null;
-        Header[] contentTypeHeaders = response.getHeaders("Content-Type");
-        if (contentTypeHeaders != null && contentTypeHeaders.length > 0) {
-            headerValue = contentTypeHeaders[0].getValue();
+        List<String> contentTypeHeaders = response.headers("Content-Type");
+        if (contentTypeHeaders != null && !contentTypeHeaders.isEmpty()) {
+            headerValue = contentTypeHeaders.get(0);
         }
 
         return Optional.ofNullable(headerValue);

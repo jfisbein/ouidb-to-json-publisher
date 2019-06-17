@@ -2,6 +2,7 @@ package com.sputnik.ouidb;
 
 import com.sputnik.ouidb.exception.NoRecordsFoundException;
 import com.sputnik.ouidb.model.Organization;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileReader;
@@ -43,7 +44,8 @@ class OUIDBDownloaderTest {
 
     @Test
     void parseDBEmpty() throws IOException {
-        assertThrows(NoRecordsFoundException.class, () -> new OUIDBDownloader().parseDb(new FileReader("src/test/resources/ouidb-empty.txt")));
+        assertThrows(NoRecordsFoundException.class, () ->
+                new OUIDBDownloader().parseDb(new FileReader("src/test/resources/ouidb-empty.txt")));
     }
 
     @Test
@@ -61,6 +63,30 @@ class OUIDBDownloaderTest {
     @Test
     void testWrongAndGoodUrl() throws IOException {
         Map<String, Organization> parsedDB = new OUIDBDownloader(new String[]{"http://thisurldoes.not.exists", "https://linuxnet.ca/ieee/oui.txt.bz2"}).getParsedDB();
+        assertNotNull(parsedDB);
+        assertFalse(parsedDB.isEmpty());
+    }
+
+    @Test
+    @Disabled
+    void testDownloadBZ2() throws IOException {
+        Map<String, Organization> parsedDB = new OUIDBDownloader("https://linuxnet.ca/ieee/oui.txt.bz2").getParsedDB();
+        assertNotNull(parsedDB);
+        assertFalse(parsedDB.isEmpty());
+    }
+
+    @Test
+    @Disabled
+    void testDownloadGZ() throws IOException {
+        Map<String, Organization> parsedDB = new OUIDBDownloader("https://linuxnet.ca/ieee/oui.txt.gz").getParsedDB();
+        assertNotNull(parsedDB);
+        assertFalse(parsedDB.isEmpty());
+    }
+
+    @Test
+    @Disabled
+    void testDownloadTXT() throws IOException {
+        Map<String, Organization> parsedDB = new OUIDBDownloader("https://linuxnet.ca/ieee/oui.txt").getParsedDB();
         assertNotNull(parsedDB);
         assertFalse(parsedDB.isEmpty());
     }
