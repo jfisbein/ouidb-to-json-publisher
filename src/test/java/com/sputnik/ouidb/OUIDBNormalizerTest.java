@@ -9,7 +9,6 @@ class OUIDBNormalizerTest {
 
     @Test
     void normalize() {
-        OUIDBDownloader downloader = new OUIDBDownloader();
         assertNull(OUIDBNormalizer.normalize(null));
         assertEquals("", OUIDBNormalizer.normalize(""));
         assertEquals("", OUIDBNormalizer.normalize(" "));
@@ -26,5 +25,23 @@ class OUIDBNormalizerTest {
         assertEquals("ABC  DEF", OUIDBNormalizer.normalize("ABC   DEF"));
         assertEquals("ABC  DEF", OUIDBNormalizer.normalize("ABC    DEF"));
         assertEquals("ABC  DEF", OUIDBNormalizer.normalize(" ABC    DEF "));
+    }
+
+    @Test
+    void normalizePrefix() {
+        assertNull(OUIDBNormalizer.normalizePrefix(null));
+        assertEquals("AABBCC", OUIDBNormalizer.normalizePrefix("AA-BB-CC"));
+        assertEquals("AABBCC", OUIDBNormalizer.normalizePrefix("AABBCC"));
+        assertEquals("AABBCC", OUIDBNormalizer.normalizePrefix("aa-bb-cc"));
+        assertEquals("AABBCC", OUIDBNormalizer.normalizePrefix("aabbcc"));
+    }
+
+    @Test
+    void normalizeOrganizationName() {
+        assertNull(OUIDBNormalizer.normalizeOrganizationName(null));
+        assertEquals("CocaCola Company", OUIDBNormalizer.normalizeOrganizationName("CocaCola Company"));
+        assertEquals("CocaCola Inc.", OUIDBNormalizer.normalizeOrganizationName("CocaCola Inc."));
+        assertEquals("CocaCola Inc.", OUIDBNormalizer.normalizeOrganizationName("CocaCola Inc.orporated"));
+        assertEquals("CocaCola Inc.", OUIDBNormalizer.normalizeOrganizationName("CocaCola inc.orporated"));
     }
 }

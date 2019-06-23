@@ -5,15 +5,20 @@ import org.apache.commons.lang3.StringUtils;
 
 public class OUIDBNormalizer {
     public static String normalizeOrganizationName(String orgName) {
-        orgName = orgName.trim();
-        orgName = StringUtils.replace(orgName, "Inc.orporated", "Inc.");
+        if (orgName != null) {
+            orgName = orgName.trim();
+            orgName = StringUtils.replaceIgnoreCase(orgName, "Inc.orporated", "Inc.");
+        }
 
         return orgName;
     }
 
     public static String normalizePrefix(String prefix) {
-        prefix = prefix.trim();
-        prefix = prefix.replace("-", "");
+        if (prefix != null) {
+            prefix = prefix.trim();
+            prefix = prefix.replace("-", "");
+            prefix = prefix.toUpperCase();
+        }
 
         return prefix;
     }
