@@ -9,7 +9,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
-import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
@@ -24,6 +23,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
+
+import static com.sputnik.ouidb.OUIDBNormalizer.normalize;
+import static com.sputnik.ouidb.OUIDBNormalizer.normalizeOrganizationName;
+import static com.sputnik.ouidb.OUIDBNormalizer.normalizePrefix;
 
 /**
  * Simple utility class to parse the latestOUI DB and parse it as case insensitive a Map.<br>
@@ -111,8 +114,8 @@ public class OUIDBDownloader {
                 line = normalize(line);
                 if (line.contains("(hex)")) {
                     String[] split = StringUtils.splitByWholeSeparator(line, "(hex)");
-                    String prefix = split[0].trim().replace("-", "");
-                    String organizationName = split[1].trim();
+                    String prefix = normalizePrefix(split[0]);
+                    String organizationName = normalizeOrganizationName(split[1]);
                     counter = 0;
                     organization = new Organization(organizationName);
                     organization.setAddress(new Address());
@@ -141,28 +144,7 @@ public class OUIDBDownloader {
             address.setCountryCode(StringUtils.trimToNull(line));
             counter++;
         }
+
         return counter;
-    }
-
-    protected String normalize(String text) {
-        String normalizedText = null;
-        if (text != null) {
-            normalizedText = text.trim();
-            normalizedText = StringUtils.removeEnd(normalizedText, ",");
-            normalizedText = StringUtils.replaceIgnoreCase(normalizedText, ",.Ltd", ". Ltd");
-
-            // Add space after ',' if missing
-            normalizedText = RegExUtils.replaceAll(normalizedText, "\\,(\\w{1})", ", $1");
-
-            // Remove space before ',' if present
-            normalizedText = RegExUtils.replaceAll(normalizedText, " \\,", ",");
-
-            normalizedText = normalizedText.trim();
-            while (normalizedText.contains("   ")) {
-                normalizedText = StringUtils.replace(normalizedText, "   ", "  ");
-            }
-        }
-
-        return normalizedText;
     }
 }
