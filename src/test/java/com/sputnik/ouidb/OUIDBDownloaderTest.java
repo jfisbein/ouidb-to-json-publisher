@@ -12,7 +12,6 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class OUIDBDownloaderTest {
@@ -89,27 +88,6 @@ class OUIDBDownloaderTest {
         Map<String, Organization> parsedDB = new OUIDBDownloader("https://linuxnet.ca/ieee/oui.txt").getParsedDB();
         assertNotNull(parsedDB);
         assertFalse(parsedDB.isEmpty());
-    }
-
-    @Test
-    void normalize() {
-        OUIDBDownloader downloader = new OUIDBDownloader();
-        assertNull(downloader.normalize(null));
-        assertEquals("", downloader.normalize(""));
-        assertEquals("", downloader.normalize(" "));
-        assertEquals("ABC", downloader.normalize("ABC"));
-        assertEquals("ABC", downloader.normalize(" ABC "));
-        assertEquals("ABC", downloader.normalize(" ABC ,"));
-        assertEquals("ABC, DEF", downloader.normalize("ABC,DEF"));
-        assertEquals("ABC, DEF", downloader.normalize("ABC, DEF"));
-        assertEquals("ABC, DEF", downloader.normalize("ABC , DEF"));
-        assertEquals("ABC. Ltd", downloader.normalize("ABC,.Ltd"));
-        assertEquals("ABC. Ltd", downloader.normalize("ABC,.ltd"));
-        assertEquals("ABC DEF", downloader.normalize("ABC DEF"));
-        assertEquals("ABC  DEF", downloader.normalize("ABC  DEF"));
-        assertEquals("ABC  DEF", downloader.normalize("ABC   DEF"));
-        assertEquals("ABC  DEF", downloader.normalize("ABC    DEF"));
-        assertEquals("ABC  DEF", downloader.normalize(" ABC    DEF "));
     }
 
     private void testOUI(Map<String, Organization> db, String prefix, String name, String addressLine1, String addressLine2, String countryCode) {
