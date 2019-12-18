@@ -42,7 +42,7 @@ class OUIDBDownloaderTest {
     }
 
     @Test
-    void parseDBEmpty() throws IOException {
+    void parseDBEmpty() {
         assertThrows(NoRecordsFoundException.class, () ->
                 new OUIDBDownloader().parseDb(new FileReader("src/test/resources/ouidb-empty.txt")));
     }
