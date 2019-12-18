@@ -70,6 +70,7 @@ public class OUIDBDownloader {
                     .url(ouiDbUrl)
                     .build();
 
+            log.info("Trying to download info from {}", ouiDbUrl);
             try {
                 Response response = client.newCall(request).execute();
                 if (response.body() != null) {
@@ -96,7 +97,7 @@ public class OUIDBDownloader {
     private Optional<String> getContentTypeHeader(Response response) {
         String headerValue = null;
         List<String> contentTypeHeaders = response.headers("Content-Type");
-        if (contentTypeHeaders != null && !contentTypeHeaders.isEmpty()) {
+        if (!contentTypeHeaders.isEmpty()) {
             headerValue = contentTypeHeaders.get(0);
         }
 
