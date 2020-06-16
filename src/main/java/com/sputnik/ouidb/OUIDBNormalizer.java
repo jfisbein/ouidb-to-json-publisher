@@ -1,47 +1,50 @@
 package com.sputnik.ouidb;
 
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 
+@UtilityClass
 public class OUIDBNormalizer {
-    public static String normalizeOrganizationName(String orgName) {
-        if (orgName != null) {
-            orgName = orgName.trim();
-            orgName = StringUtils.replaceIgnoreCase(orgName, "Inc.orporated", "Inc.");
-        }
 
-        return orgName;
+  public static String normalizeOrganizationName(String orgName) {
+    if (orgName != null) {
+      orgName = orgName.trim();
+      orgName = StringUtils.replaceIgnoreCase(orgName, "Inc.orporated", "Inc.");
     }
 
-    public static String normalizePrefix(String prefix) {
-        if (prefix != null) {
-            prefix = prefix.trim();
-            prefix = prefix.replace("-", "");
-            prefix = prefix.toUpperCase();
-        }
+    return orgName;
+  }
 
-        return prefix;
+  public static String normalizePrefix(String prefix) {
+    if (prefix != null) {
+      prefix = prefix.trim();
+      prefix = prefix.replace("-", "");
+      prefix = prefix.toUpperCase();
     }
 
-    public static String normalize(String text) {
-        String normalizedText = null;
-        if (text != null) {
-            normalizedText = text.trim();
-            normalizedText = StringUtils.removeEnd(normalizedText, ",");
-            normalizedText = StringUtils.replaceIgnoreCase(normalizedText, ",.Ltd", ". Ltd");
+    return prefix;
+  }
 
-            // Add space after ',' if missing
-            normalizedText = RegExUtils.replaceAll(normalizedText, "\\,(\\w{1})", ", $1");
+  public static String normalize(String text) {
+    String normalizedText = null;
+    if (text != null) {
+      normalizedText = text.trim();
+      normalizedText = StringUtils.removeEnd(normalizedText, ",");
+      normalizedText = StringUtils.replaceIgnoreCase(normalizedText, ",.Ltd", ". Ltd");
 
-            // Remove space before ',' if present
-            normalizedText = RegExUtils.replaceAll(normalizedText, " \\,", ",");
+      // Add space after ',' if missing
+      normalizedText = RegExUtils.replaceAll(normalizedText, "\\,(\\w{1})", ", $1");
 
-            normalizedText = normalizedText.trim();
-            while (normalizedText.contains("   ")) {
-                normalizedText = StringUtils.replace(normalizedText, "   ", "  ");
-            }
-        }
+      // Remove space before ',' if present
+      normalizedText = RegExUtils.replaceAll(normalizedText, " \\,", ",");
 
-        return normalizedText;
+      normalizedText = normalizedText.trim();
+      while (normalizedText.contains("   ")) {
+        normalizedText = StringUtils.replace(normalizedText, "   ", "  ");
+      }
     }
+
+    return normalizedText;
+  }
 }
