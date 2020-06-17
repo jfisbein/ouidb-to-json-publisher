@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: run ouidb-to-json-publisher
-        run: |
+        run: >
           docker run --name ouidb-to-json-publisher --rm
-          --env "REPO_USERNAME=${{ secrets.GITHUB_TOKEN }}"
+          --env "REPO_USERNAME=${{ secrets.MY_GITHUB_TOKEN }}"
           --env "REPO_URL=https://github.com/jfisbein/ouidb-json"
           jfisbein/ouidb-to-json-publisher
