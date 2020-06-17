@@ -11,7 +11,7 @@ RUN mvn dependency:go-offline --batch-mode
 COPY ./src ./src
 
 # build for release
-RUN mvn package --batch-mode
+RUN mvn package --batch-mode -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Djacoco.skip=true
 
 # final base image
 #FROM openjdk:8-jre-alpine
