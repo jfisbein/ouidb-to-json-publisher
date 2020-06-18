@@ -11,12 +11,13 @@ RUN mvn dependency:go-offline --batch-mode
 COPY ./src ./src
 
 # build for release
-RUN mvn package --batch-mode -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Djacoco.skip=true
+RUN mvn package --batch-mode --quiet -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Djacoco.skip=true
 
 # final base image
 #FROM openjdk:8-jre-alpine
 FROM openjdk:11-jre-slim
 
 COPY --from=maven target/ouidb-to-json-publisher-jar-with-dependencies.jar /
+ENV DATA='/var/data'
 
-ENTRYPOINT ["sh", "-c", "java -jar /ouidb-to-json-publisher-jar-with-dependencies.jar '/var/data' \"${REPO_URL}\" \"${REPO_USERNAME}\" \"${REPO_PASSWORD}\""]
+CMD java -jar /ouidb-to-json-publisher-jar-with-dependencies.jar
