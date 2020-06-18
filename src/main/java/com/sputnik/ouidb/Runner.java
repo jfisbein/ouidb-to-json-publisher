@@ -1,5 +1,9 @@
 package com.sputnik.ouidb;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
+import com.sputnik.ouidb.cli.EnvironmentDefaultProvider;
+import com.sputnik.ouidb.cli.Params;
 import com.sputnik.ouidb.model.Organization;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -32,22 +36,33 @@ public class Runner {
 
   private final OUIDBDownloader downloader = new OUIDBDownloader();
   private final OUIDBConverter converter = new OUIDBConverter();
-  private final File dataPath;
-  private final String repoRemoteUri;
-  private final String repoUsername;
-  private final String repoPassword;
+  private final Params params;
 
   public static void main(String[] args) throws Exception {
     ExitCode exitCode;
-    if (args.length != 4) {
-      log.error("Expected four arguments");
-      log
-        .error("Usage java -jar ouidb-to-json-publisher.jar {DATA_FOLDER} {REMOTE_REPO_URI} {REMOTE_REPO_USERNAME} {REMOTE_REPO_PASSWORD}");
+
+    Params params = new Params();
+    JCommander jCommander = JCommander.newBuilder()
+      .programName("java -jar ouidb-to-json-publisher-jar-with-dependencies.jar")
+      .addObject(params)
+      .defaultProvider(new EnvironmentDefaultProvider(false))
+      .build();
+
+    try {
+      jCommander.parse(args);
+      if (params.isHelp()) {
+        jCommander.usage();
+        exitCode = ExitCode.PARAMS_ERROR;
+      } else {
+        log.info("Running with {}", params);
+        exitCode = new Runner(params).run();
+      }
+    } catch (ParameterException pe) {
+      log.error(pe.getMessage());
+      pe.getJCommander().usage();
       exitCode = ExitCode.PARAMS_ERROR;
-    } else {
-      log.info("Running with {} {} {} {}", args);
-      exitCode = new Runner(new File(args[0]), args[1], args[2], args[3]).run();
     }
+
     System.exit(exitCode.getCode());
   }
 
@@ -83,12 +98,13 @@ public class Runner {
   }
 
   private File getOuiDBFile() {
-    return new File(dataPath, "ouidb.json");
+    return new File(params.getDataFolder(), "ouidb.json");
   }
 
   private Git getGitRepo() throws GitAPIException, IOException {
     Git git;
     CredentialsProvider.setDefault(getCredentialsProvider());
+    File dataPath = params.getDataFolder();
     if (!dataPath.exists()) {
       log.info("Git repo path does not exists, creating it.");
       dataPath.mkdirs();
@@ -99,11 +115,19 @@ public class Runner {
       log.info("Repo opened, pulling latest changes.");
       git.pull().call();
     } catch (RepositoryNotFoundException e) {
-      log.info("Repo does not exists, cloning from {}", repoRemoteUri);
+      log.info("Repo does not exists, cloning from {}", params.getRemoteRepositoryUri());
       git = Git.cloneRepository()
         .setDirectory(dataPath)
-        .setURI(repoRemoteUri)
+        .setURI(params.getRemoteRepositoryUri())
         .call();
+    }
+
+    if (StringUtils.isNotBlank(params.getGitAuthorName())) {
+      git.getRepository().getConfig().setString("user", null, "name", params.getGitAuthorName());
+    }
+
+    if (StringUtils.isNotBlank(params.getGitAuthorEmail())) {
+      git.getRepository().getConfig().setString("user", null, "email", params.getGitAuthorEmail());
     }
 
     return git;
@@ -139,9 +163,10 @@ public class Runner {
 
   private CredentialsProvider getCredentialsProvider() {
     CredentialsProvider credentialsProvider;
-    if (StringUtils.isNotBlank(repoUsername) || StringUtils.isNotBlank(repoPassword)) {
+    if (StringUtils.isNotBlank(params.getRemoteRepositoryUsername()) || StringUtils.isNotBlank(params.getRemoteRepositoryPassword())) {
       log.info("Using username and password for git repo auth");
-      credentialsProvider = new UsernamePasswordCredentialsProvider(repoUsername, repoPassword);
+      credentialsProvider = new UsernamePasswordCredentialsProvider(params.getRemoteRepositoryUsername(),
+        StringUtils.trimToEmpty(params.getRemoteRepositoryPassword()));
     } else {
       credentialsProvider = CredentialsProvider.getDefault();
     }
