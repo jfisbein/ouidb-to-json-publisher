@@ -3,10 +3,9 @@ package com.sputnik.ouidb.cli;
 import com.beust.jcommander.Parameter;
 import java.io.File;
 import lombok.Getter;
-import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 @Getter
-@ToString
 public class Params {
 
   @Parameter(names = "-data", description = "Data folder", required = true, converter = FileConverter.class, order = 1)
@@ -29,4 +28,29 @@ public class Params {
 
   @Parameter(names = {"--help", "-h"}, help = true, description = "show this help message", order = 0)
   private boolean help;
+
+  @Override
+  public String toString() {
+    return "Params{" +
+      "dataFolder=" + dataFolder +
+      ", remoteRepositoryUri='" + remoteRepositoryUri + '\'' +
+      ", remoteRepositoryUsername='" + mask(remoteRepositoryUsername) + '\'' +
+      ", remoteRepositoryPassword='" + mask(remoteRepositoryPassword) + '\'' +
+      ", gitAuthorName='" + gitAuthorName + '\'' +
+      ", gitAuthorEmail='" + mask(gitAuthorEmail) +
+      '}';
+  }
+
+  private String mask(String text) {
+    String mask = null;
+    if (text != null) {
+      if (text.length() > 4) {
+        mask = StringUtils.left(text, 2) + StringUtils.repeat('*', text.length() - 2) + StringUtils.right(text, 2);
+      } else {
+        mask = StringUtils.repeat('*', text.length());
+      }
+    }
+
+    return mask;
+  }
 }
