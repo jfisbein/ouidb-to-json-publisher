@@ -68,6 +68,7 @@ class OUIDBDownloaderTest {
   }
 
   @Test
+  @Disabled("Only for manual testing")
   void testWrongAndGoodUrl() throws IOException {
     Map<String, Organization> parsedDB = new OUIDBDownloader(
       new String[]{"http://thisurldoes.not.exists", "https://linuxnet.ca/ieee/oui.txt.bz2"}).getParsedDB();
