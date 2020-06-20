@@ -14,7 +14,6 @@ COPY ./src ./src
 RUN mvn package --batch-mode --quiet -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Djacoco.skip=true
 
 # final base image
-#FROM openjdk:8-jre-alpine
 FROM openjdk:11-jre-slim
 
 COPY --from=maven target/ouidb-to-json-publisher-jar-with-dependencies.jar /
