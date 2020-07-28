@@ -5,10 +5,14 @@ updates:
   schedule:
     interval: daily
     time: "04:00"
+  assignees:
+    - "jfisbein"
   open-pull-requests-limit: 10
 - package-ecosystem: maven
   directory: "/"
   schedule:
     interval: daily
     time: "04:00"
+  assignees:
+    - "jfisbein"
   open-pull-requests-limit: 10
