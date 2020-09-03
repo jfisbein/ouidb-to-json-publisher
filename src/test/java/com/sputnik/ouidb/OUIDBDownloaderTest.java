@@ -1,9 +1,7 @@
 package com.sputnik.ouidb;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sputnik.ouidb.exception.NoRecordsFoundException;
 import com.sputnik.ouidb.model.Organization;
@@ -22,7 +20,7 @@ class OUIDBDownloaderTest {
     Map<String, Organization> db = new OUIDBDownloader().parseDb(new FileReader("src/test/resources/ouidb-test.txt"));
 
     // All OUI parsed
-    assertEquals(9, db.size(), "Missing some OUIs from parsed result");
+    assertThat(db).as("Missing some OUIs from parsed result").hasSize(9);
 
     // Private
     testOUI(db, "E4F14C", "Private", null, null, null);
@@ -49,7 +47,7 @@ class OUIDBDownloaderTest {
   void parseDBEmpty() {
     try (FileReader emptyDBFileReader = new FileReader("src/test/resources/ouidb-empty.txt")) {
       OUIDBDownloader ouidbDownloader = new OUIDBDownloader();
-      assertThrows(NoRecordsFoundException.class, () -> ouidbDownloader.parseDb(emptyDBFileReader));
+      assertThatThrownBy(() -> ouidbDownloader.parseDb(emptyDBFileReader)).isInstanceOf(NoRecordsFoundException.class);
     } catch (IOException e) {
       log.warn(e.getMessage());
     }
@@ -58,13 +56,13 @@ class OUIDBDownloaderTest {
   @Test
   void testUnknownHostUrl() {
     OUIDBDownloader unknownHostUrlOuidbDownloader = new OUIDBDownloader("http://thisurldoes.not.exists");
-    assertThrows(NoRecordsFoundException.class, unknownHostUrlOuidbDownloader::getParsedDB);
+    assertThatThrownBy(unknownHostUrlOuidbDownloader::getParsedDB).isInstanceOf(NoRecordsFoundException.class);
   }
 
   @Test
   void testWrongUrl() {
     OUIDBDownloader wrongUrlOuiDBDownloader = new OUIDBDownloader("http://www.google.com");
-    assertThrows(NoRecordsFoundException.class, wrongUrlOuiDBDownloader::getParsedDB);
+    assertThatThrownBy(wrongUrlOuiDBDownloader::getParsedDB).isInstanceOf(NoRecordsFoundException.class);
   }
 
   @Test
@@ -72,40 +70,40 @@ class OUIDBDownloaderTest {
   void testWrongAndGoodUrl() throws IOException {
     Map<String, Organization> parsedDB = new OUIDBDownloader(
       new String[]{"http://thisurldoes.not.exists", "https://linuxnet.ca/ieee/oui.txt.bz2"}).getParsedDB();
-    assertNotNull(parsedDB);
-    assertFalse(parsedDB.isEmpty());
+    assertThat(parsedDB).isNotEmpty();
   }
 
   @Test
   @Disabled("Only for manual testing")
   void testDownloadBZ2() throws IOException {
     Map<String, Organization> parsedDB = new OUIDBDownloader("https://linuxnet.ca/ieee/oui.txt.bz2").getParsedDB();
-    assertNotNull(parsedDB);
-    assertFalse(parsedDB.isEmpty());
+    assertThat(parsedDB).isNotEmpty();
   }
 
   @Test
   @Disabled("Only for manual testing")
   void testDownloadGZ() throws IOException {
     Map<String, Organization> parsedDB = new OUIDBDownloader("https://linuxnet.ca/ieee/oui.txt.gz").getParsedDB();
-    assertNotNull(parsedDB);
-    assertFalse(parsedDB.isEmpty());
+    assertThat(parsedDB).isNotEmpty();
   }
 
   @Test
   @Disabled("Only for manual testing")
   void testDownloadTXT() throws IOException {
     Map<String, Organization> parsedDB = new OUIDBDownloader("https://linuxnet.ca/ieee/oui.txt").getParsedDB();
-    assertNotNull(parsedDB);
-    assertFalse(parsedDB.isEmpty());
+    assertThat(parsedDB).isNotEmpty();
   }
 
   private void testOUI(Map<String, Organization> db, String prefix, String name, String addressLine1, String addressLine2,
     String countryCode) {
-    assertNotNull(db.get(prefix));
-    assertEquals(name, db.get(prefix).getName());
-    assertEquals(addressLine1, db.get(prefix).getAddress().getLine1());
-    assertEquals(addressLine2, db.get(prefix).getAddress().getLine2());
-    assertEquals(countryCode, db.get(prefix).getAddress().getCountryCode());
+    assertThat(db).containsKey(prefix);
+
+    assertThat(db.get(prefix)).satisfies(org -> {
+        assertThat(org.getName()).isEqualTo(name);
+        assertThat(org.getAddress().getLine1()).isEqualTo(addressLine1);
+        assertThat(org.getAddress().getLine2()).isEqualTo(addressLine2);
+        assertThat(org.getAddress().getCountryCode()).isEqualTo(countryCode);
+      }
+    );
   }
 }

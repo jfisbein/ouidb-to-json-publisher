@@ -1,8 +1,6 @@
 package com.sputnik.ouidb;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.javafaker.Faker;
 import com.google.gson.Gson;
@@ -32,20 +30,21 @@ class OUIDBConverterTest {
     List<Map<String, Object>> parsedJson = gson.fromJson(json, new TypeToken<List<Map<String, Object>>>() {
     }.getType());
 
-    assertEquals(db.size(), parsedJson.size());
+    assertThat(parsedJson).hasSize(db.size());
     for (String prefix : db.keySet()) {
       Organization org = db.get(prefix);
 
       Optional<Map<String, Object>> jsonEntryOpt = parsedJson.stream().filter(m -> m.get("prefix").equals(prefix)).findFirst();
 
-      assertTrue(jsonEntryOpt.isPresent());
+      assertThat(jsonEntryOpt).isPresent();
       Map<String, Object> jsonEntry = jsonEntryOpt.get();
       Map<String, Object> jsonOrg = (Map<String, Object>) jsonEntry.get("organization");
-      assertEquals(org.getName(), jsonOrg.get("name"));
+      assertThat(jsonOrg).containsEntry("name", org.getName());
       Map<String, Object> jsonAddress = (Map<String, Object>) jsonOrg.get("address");
-      assertEquals(org.getAddress().getLine1(), jsonAddress.get("line1"));
-      assertEquals(org.getAddress().getLine2(), jsonAddress.get("line2"));
-      assertEquals(org.getAddress().getCountryCode(), jsonAddress.get("countryCode"));
+      assertThat(jsonAddress)
+        .containsEntry("line1", org.getAddress().getLine1())
+        .containsEntry("line2", org.getAddress().getLine2())
+        .containsEntry("countryCode", org.getAddress().getCountryCode());
     }
   }
 
@@ -54,14 +53,14 @@ class OUIDBConverterTest {
     OUIDBConverter converter = new OUIDBConverter();
     Map<String, Organization> db = new HashMap<>();
     String json = converter.convertToJson(db);
-    assertEquals("[]", json);
+    assertThat(json).isEqualTo("[]");
   }
 
   @Test
   void convertNullDb() {
     OUIDBConverter converter = new OUIDBConverter();
     String json = converter.convertToJson(null);
-    assertNull(json);
+    assertThat(json).isNull();
   }
 
   private Map<String, Organization> generateDb(int size) {
