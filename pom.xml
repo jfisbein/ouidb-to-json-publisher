@@ -6,7 +6,7 @@
 
   <groupId>com.sputnik</groupId>
   <artifactId>ouidb-to-json-publisher</artifactId>
-  <version>1.5.2-SNAPSHOT</version>
+  <version>1.5.2</version>
 
   <url>https://github.com/jfisbein/ouidb-to-json-publisher</url>
   <scm>
