@@ -16,6 +16,11 @@ RUN mvn package --batch-mode --quiet -Dmaven.test.skip=true -Dmaven.javadoc.skip
 # final base image
 FROM openjdk:11-jre-slim
 
+# Build-time metadata as defined at https://github.com/opencontainers/image-spec/blob/master/annotations.md
+LABEL org.opencontainers.image.title="OUIDB to JSON publisher" \
+      org.opencontainers.image.description="Converts the OUI Database to Json and publish to GIT repo" \
+      org.opencontainers.image.source="https://github.com/jfisbein/ouidb-to-json-publisher"
+
 COPY --from=maven target/ouidb-to-json-publisher-jar-with-dependencies.jar /
 ENV DATA='/var/data'
 

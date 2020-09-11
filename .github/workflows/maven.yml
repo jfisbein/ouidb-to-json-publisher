@@ -48,3 +48,4 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: jfisbein/ouidb-to-json-publisher
           tag_with_ref: true
+          add_git_labels: true
