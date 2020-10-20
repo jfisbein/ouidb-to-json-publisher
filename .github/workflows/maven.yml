@@ -47,7 +47,7 @@ jobs:
           name: ouidb-to-json-publisher
           path: target/ouidb-to-json-publisher-jar-with-dependencies.jar
 
-      - name: Prepare
+      - name: Prepare Docker build
         id: prep
         run: |
           DOCKER_IMAGE=jfisbein/ouidb-to-json-publisher
@@ -101,7 +101,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64,linux/386
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.prep.outputs.tags }}
           labels: |
