@@ -31,7 +31,7 @@ jobs:
         run: mvn --batch-mode package
 
       - name: Publish Test Report
-        uses: scacap/action-surefire-report@v1.0.10
+        uses: scacap/action-surefire-report@v1.0.11
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
