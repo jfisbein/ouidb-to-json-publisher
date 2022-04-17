@@ -1,8 +1,8 @@
 package com.sputnik.ouidb;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class OUIDBNormalizerTest {
 
@@ -20,10 +20,10 @@ class OUIDBNormalizerTest {
     assertThat(OUIDBNormalizer.normalize("ABC,.Ltd")).isEqualTo("ABC. Ltd");
     assertThat(OUIDBNormalizer.normalize("ABC,.ltd")).isEqualTo("ABC. Ltd");
     assertThat(OUIDBNormalizer.normalize("ABC DEF")).isEqualTo("ABC DEF");
-    assertThat(OUIDBNormalizer.normalize("ABC  DEF")).isEqualTo("ABC  DEF");
-    assertThat(OUIDBNormalizer.normalize("ABC   DEF")).isEqualTo("ABC  DEF");
-    assertThat(OUIDBNormalizer.normalize("ABC    DEF")).isEqualTo("ABC  DEF");
-    assertThat(OUIDBNormalizer.normalize(" ABC    DEF ")).isEqualTo("ABC  DEF");
+    assertThat(OUIDBNormalizer.normalize("ABC  DEF")).isEqualTo("ABC DEF");
+    assertThat(OUIDBNormalizer.normalize("ABC   DEF")).isEqualTo("ABC DEF");
+    assertThat(OUIDBNormalizer.normalize("ABC    DEF")).isEqualTo("ABC DEF");
+    assertThat(OUIDBNormalizer.normalize(" ABC    DEF ")).isEqualTo("ABC DEF");
   }
 
   @Test
@@ -38,9 +38,9 @@ class OUIDBNormalizerTest {
   @Test
   void normalizeOrganizationName() {
     assertThat(OUIDBNormalizer.normalizeOrganizationName(null)).isNull();
-    assertThat(OUIDBNormalizer.normalizeOrganizationName("CocaCola Company")).isEqualTo("CocaCola Company");
-    assertThat(OUIDBNormalizer.normalizeOrganizationName("CocaCola Inc.")).isEqualTo("CocaCola Inc.");
-    assertThat(OUIDBNormalizer.normalizeOrganizationName("CocaCola Inc.orporated")).isEqualTo("CocaCola Inc.");
-    assertThat(OUIDBNormalizer.normalizeOrganizationName("CocaCola inc.orporated")).isEqualTo("CocaCola Inc.");
+    assertThat(OUIDBNormalizer.normalizeOrganizationName("CocaCola Company")).isEqualTo("Cocacola Company");
+    assertThat(OUIDBNormalizer.normalizeOrganizationName("CocaCola Inc.")).isEqualTo("Cocacola Inc");
+    assertThat(OUIDBNormalizer.normalizeOrganizationName("CocaCola Inc.orporated")).isEqualTo("Cocacola Inc");
+    assertThat(OUIDBNormalizer.normalizeOrganizationName("CocaCola inc.orporated")).isEqualTo("Cocacola Inc");
   }
 }
