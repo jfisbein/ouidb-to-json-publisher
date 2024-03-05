@@ -134,7 +134,7 @@ public class Runner {
   }
 
   private File compressFileToGz(File file) {
-    File compressedFile = new File(GzipUtils.getCompressedFilename(file.getAbsolutePath()));
+    File compressedFile = new File(GzipUtils.getCompressedFileName(file.getAbsolutePath()));
     try (InputStream in = Files.newInputStream(file.toPath());
       GzipCompressorOutputStream out = new GzipCompressorOutputStream(
         new BufferedOutputStream(Files.newOutputStream(compressedFile.toPath())))) {
@@ -148,7 +148,7 @@ public class Runner {
   }
 
   private File compressFileToBz2(File file) {
-    File compressedFile = new File(BZip2Utils.getCompressedFilename(file.getAbsolutePath()));
+    File compressedFile = new File(BZip2Utils.getCompressedFileName(file.getAbsolutePath()));
     try (InputStream in = Files.newInputStream(file.toPath());
       BZip2CompressorOutputStream out = new BZip2CompressorOutputStream(
         new BufferedOutputStream(Files.newOutputStream(compressedFile.toPath())))) {

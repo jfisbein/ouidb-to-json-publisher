@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class EnvironmentDefaultProvider implements IDefaultProvider {
 
-  private Map<String, String> env;
+  private final Map<String, String> env;
 
   public EnvironmentDefaultProvider(boolean caseSensitive) {
     if (caseSensitive) {
