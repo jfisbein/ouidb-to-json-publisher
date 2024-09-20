@@ -73,6 +73,8 @@ public class OUIDBDownloader {
           } else {
             result = response.body().charStream();
           }
+        } else {
+          log.warn("Error downloading OUIs. Error: {} - {}", response.code(), response.message());
         }
       } catch (IOException e) {
         log.warn("Error downloading OUIs from {} - {}: {}", ouiDbUrl, e.getClass().getSimpleName(), e.getMessage());
