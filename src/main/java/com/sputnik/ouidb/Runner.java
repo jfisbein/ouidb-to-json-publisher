@@ -119,6 +119,7 @@ public class Runner {
       git = Git.cloneRepository()
         .setDirectory(dataPath)
         .setURI(params.getRemoteRepositoryUri())
+        .setDepth(2)
         .call();
     }
 
