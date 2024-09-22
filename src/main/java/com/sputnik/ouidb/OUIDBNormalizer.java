@@ -1,12 +1,11 @@
 package com.sputnik.ouidb;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @UtilityClass
 public class OUIDBNormalizer {
@@ -63,11 +62,12 @@ public class OUIDBNormalizer {
       normalizedText = StringUtils.replaceIgnoreCase(normalizedText, ",.Ltd", ". Ltd");
 
       // Add space after ',' if missing
-      normalizedText = RegExUtils.replaceAll(normalizedText, "\\,(\\w{1})", ", $1");
+      normalizedText = RegExUtils.replaceAll(normalizedText, "\\,(\\w)", ", $1");
 
       // Remove space before ',' if present
       normalizedText = RegExUtils.replaceAll(normalizedText, " \\,", ",");
 
+      // Replace multiple spaces by one space
       normalizedText = normalizedText.trim();
       while (normalizedText.contains("   ")) {
         normalizedText = StringUtils.replace(normalizedText, "   ", "  ");
@@ -75,6 +75,7 @@ public class OUIDBNormalizer {
 
       normalizedText = normalizedText.replace("  ", " ");
 
+      // Remove space before '.' if present
       normalizedText = StringUtils.replace(normalizedText, " .", ".");
       normalizedText = normalizedText.trim();
     }
