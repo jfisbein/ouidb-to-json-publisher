@@ -32,6 +32,7 @@ import org.apache.commons.io.IOUtils;
 @Slf4j
 public class OUIDBDownloader {
 
+  private static final String CHROME_USER_AGENT = "Mozilla/5.0 (Windows NT 11.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.6998.166 Safari/537.36";
   private String ouiDbUrl = "http://standards-oui.ieee.org/oui/oui.txt";
   private final OUIDBParser ouidbParser = new OUIDBParser();
 
@@ -53,6 +54,8 @@ public class OUIDBDownloader {
     HttpClient httpClient = getHttpClient();
 
     HttpRequest httpRequest = HttpRequest.newBuilder()
+      .setHeader("Accept", "Accept: text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8")
+      .setHeader("User-Agent", CHROME_USER_AGENT)
       .uri(new URI(ouiDbUrl))
       .GET()
       .build();
