@@ -65,10 +65,12 @@ public class OUIDBDownloader {
     try {
       HttpResponse<InputStream> httpResponse = httpClient.send(httpRequest, BodyHandlers.ofInputStream());
 
-      if (httpResponse != null && httpResponse.statusCode() == 200) {
-        result = new InputStreamReader(httpResponse.body());
-      } else {
-        log.warn("Error downloading OUIs. Error: {} - {}", httpResponse.statusCode(), IOUtils.toString(httpResponse.body(), UTF_8));
+      if (httpResponse != null) {
+        if (httpResponse.statusCode() == 200) {
+          result = new InputStreamReader(httpResponse.body());
+        } else {
+          log.warn("HTTP Error downloading OUIs. Error: {} - {}", httpResponse.statusCode(), IOUtils.toString(httpResponse.body(), UTF_8));
+        }
       }
     } catch (IOException e) {
       log.warn("Error downloading OUIs from {} - {}", ouiDbUrl, e.getClass().getSimpleName(), e);
