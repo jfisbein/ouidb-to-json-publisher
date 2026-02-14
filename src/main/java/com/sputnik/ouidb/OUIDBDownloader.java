@@ -1,9 +1,11 @@
 package com.sputnik.ouidb;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import com.sputnik.ouidb.exception.NoRecordsFoundException;
 import com.sputnik.ouidb.model.Organization;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,9 +17,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Map;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Simple utility class to parse the latestOUI DB and parse it as case insensitive a Map.<br> Usage:
@@ -70,7 +71,7 @@ public class OUIDBDownloader {
         log.warn("Error downloading OUIs. Error: {} - {}", httpResponse.statusCode(), IOUtils.toString(httpResponse.body(), UTF_8));
       }
     } catch (IOException e) {
-      log.warn("Error downloading OUIs from {} - {}: {}", ouiDbUrl, e.getClass().getSimpleName(), e.getMessage());
+      log.warn("Error downloading OUIs from {} - {}", ouiDbUrl, e.getClass().getSimpleName(), e);
     }
 
     if (result == null) {
