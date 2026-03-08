@@ -5,14 +5,6 @@ import com.beust.jcommander.ParameterException;
 import com.sputnik.ouidb.cli.EnvironmentDefaultProvider;
 import com.sputnik.ouidb.cli.Params;
 import com.sputnik.ouidb.model.Organization;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.attribute.PosixFilePermissions;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
@@ -27,6 +19,11 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -73,9 +70,10 @@ public class Runner {
     try (Git git = getGitRepo()) {
       Map<String, Organization> parsedDB = downloader.getParsedDB();
       String json = converter.convertToJson(parsedDB);
-      FileWriter writer = new FileWriter(ouiDBFile);
-      IOUtils.write(json, writer);
-      writer.flush();
+      try (FileWriter writer = new FileWriter(ouiDBFile)) {
+        IOUtils.write(json, writer);
+        writer.flush();
+      }
       Status status = git.status().call();
       if (!status.getModified().isEmpty()) {
         exitCode = ExitCode.THERES_CHANGES;
@@ -137,12 +135,13 @@ public class Runner {
   private File compressFileToGz(File file) {
     File compressedFile = new File(GzipUtils.getCompressedFileName(file.getAbsolutePath()));
     try (InputStream in = Files.newInputStream(file.toPath());
-      GzipCompressorOutputStream out = new GzipCompressorOutputStream(
-        new BufferedOutputStream(Files.newOutputStream(compressedFile.toPath())))) {
+         GzipCompressorOutputStream out = new GzipCompressorOutputStream(
+           new BufferedOutputStream(Files.newOutputStream(compressedFile.toPath())))) {
       setFilePermissions(compressedFile, DEFAULT_FILE_PERMISSIONS);
       IOUtils.copy(in, out);
     } catch (IOException e) {
       log.error("Error compressing file to gz", e);
+      throw new RuntimeException("Error compressing file to gz", e);
     }
 
     return compressedFile;
@@ -151,12 +150,13 @@ public class Runner {
   private File compressFileToBz2(File file) {
     File compressedFile = new File(BZip2Utils.getCompressedFileName(file.getAbsolutePath()));
     try (InputStream in = Files.newInputStream(file.toPath());
-      BZip2CompressorOutputStream out = new BZip2CompressorOutputStream(
-        new BufferedOutputStream(Files.newOutputStream(compressedFile.toPath())))) {
+         BZip2CompressorOutputStream out = new BZip2CompressorOutputStream(
+           new BufferedOutputStream(Files.newOutputStream(compressedFile.toPath())))) {
       setFilePermissions(compressedFile, DEFAULT_FILE_PERMISSIONS);
       IOUtils.copy(in, out);
     } catch (IOException e) {
       log.error("Error compressing file to bz2", e);
+      throw new RuntimeException("Error compressing file to bz2", e);
     }
 
     return compressedFile;
