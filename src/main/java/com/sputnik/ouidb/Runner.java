@@ -137,11 +137,16 @@ public class Runner {
     try (InputStream in = Files.newInputStream(file.toPath());
          GzipCompressorOutputStream out = new GzipCompressorOutputStream(
            new BufferedOutputStream(Files.newOutputStream(compressedFile.toPath())))) {
-      setFilePermissions(compressedFile, DEFAULT_FILE_PERMISSIONS);
       IOUtils.copy(in, out);
     } catch (IOException e) {
       log.error("Error compressing file to gz", e);
       throw new RuntimeException("Error compressing file to gz", e);
+    }
+    try {
+      setFilePermissions(compressedFile, DEFAULT_FILE_PERMISSIONS);
+    } catch (IOException e) {
+      log.error("Error setting permissions on gz file", e);
+      throw new RuntimeException("Error setting permissions on gz file", e);
     }
 
     return compressedFile;
@@ -152,11 +157,16 @@ public class Runner {
     try (InputStream in = Files.newInputStream(file.toPath());
          BZip2CompressorOutputStream out = new BZip2CompressorOutputStream(
            new BufferedOutputStream(Files.newOutputStream(compressedFile.toPath())))) {
-      setFilePermissions(compressedFile, DEFAULT_FILE_PERMISSIONS);
       IOUtils.copy(in, out);
     } catch (IOException e) {
       log.error("Error compressing file to bz2", e);
       throw new RuntimeException("Error compressing file to bz2", e);
+    }
+    try {
+      setFilePermissions(compressedFile, DEFAULT_FILE_PERMISSIONS);
+    } catch (IOException e) {
+      log.error("Error setting permissions on bz2 file", e);
+      throw new RuntimeException("Error setting permissions on bz2 file", e);
     }
 
     return compressedFile;
