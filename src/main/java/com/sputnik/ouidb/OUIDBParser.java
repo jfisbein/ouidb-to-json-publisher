@@ -29,7 +29,7 @@ public class OUIDBParser {
         if (line.contains("(hex)")) {
           String[] split = StringUtils.splitByWholeSeparator(line, "(hex)");
           String prefix = normalizePrefix(split[0]);
-          String organizationName = normalizeOrganizationName(split[1]);
+          String organizationName = split.length > 1 ? normalizeOrganizationName(split[1]) : null;
           counter = 0;
           organization = new Organization(organizationName);
           organization.setAddress(new Address());

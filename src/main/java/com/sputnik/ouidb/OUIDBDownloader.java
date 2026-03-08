@@ -2,7 +2,6 @@ package com.sputnik.ouidb;
 
 import com.sputnik.ouidb.exception.NoRecordsFoundException;
 import com.sputnik.ouidb.model.Organization;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 
@@ -11,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpRequest;
@@ -49,17 +49,21 @@ public class OUIDBDownloader {
     return ouidbParser.parseDb(download());
   }
 
-  @SneakyThrows
-  public Reader download() {
+  public Reader download() throws IOException {
     Reader result = null;
     HttpClient httpClient = getHttpClient();
 
-    HttpRequest httpRequest = HttpRequest.newBuilder()
-      .setHeader("Accept", "Accept: text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8")
-      .setHeader("User-Agent", CHROME_USER_AGENT)
-      .uri(new URI(ouiDbUrl))
-      .GET()
-      .build();
+    HttpRequest httpRequest;
+    try {
+      httpRequest = HttpRequest.newBuilder()
+        .setHeader("Accept", "Accept: text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8")
+        .setHeader("User-Agent", CHROME_USER_AGENT)
+        .uri(new URI(ouiDbUrl))
+        .GET()
+        .build();
+    } catch (URISyntaxException e) {
+      throw new NoRecordsFoundException("Invalid URL: " + ouiDbUrl, e);
+    }
 
     log.info("Trying to download info from {}", ouiDbUrl);
     try {
@@ -72,6 +76,9 @@ public class OUIDBDownloader {
           log.warn("HTTP Error downloading OUIs. Error: {} - {}", httpResponse.statusCode(), IOUtils.toString(httpResponse.body(), UTF_8));
         }
       }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new NoRecordsFoundException("Download interrupted", e);
     } catch (IOException e) {
       log.warn("Error downloading OUIs from {} - {}", ouiDbUrl, e.getClass().getSimpleName(), e);
     }
