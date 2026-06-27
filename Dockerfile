@@ -1,5 +1,8 @@
 # base build image
-FROM maven:3.9.9-eclipse-temurin-21-jammy AS maven
+# Pin the build stage to the builder's native platform: the output is a portable
+# (architecture-independent) fat jar, so Maven never needs to run under emulation.
+# Only the small final JRE stage below fans out per target architecture.
+FROM --platform=$BUILDPLATFORM maven:3.9.9-eclipse-temurin-21-jammy AS maven
 
 # copy the project files
 COPY ./pom.xml ./pom.xml
