@@ -81,6 +81,27 @@ class OUIDBDownloaderTest {
   }
 
   @Test
+  void testDownloadAsStringReturnsRawTextForMirroring() throws IOException {
+    HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+    server.createContext("/oui.txt", exchange -> respond(exchange, SAMPLE_OUI));
+    server.start();
+
+    try {
+      String url = "http://127.0.0.1:" + server.getAddress().getPort() + "/oui.txt";
+      OUIDBDownloader downloader = new OUIDBDownloader(url);
+
+      String raw = downloader.downloadAsString();
+
+      // The raw text must be returned verbatim so it can be published as a mirror.
+      assertThat(raw).isEqualTo(SAMPLE_OUI);
+      // ...and still parse correctly from that same raw text.
+      assertThat(downloader.parse(raw)).containsKey("00000C");
+    } finally {
+      server.stop(0);
+    }
+  }
+
+  @Test
   void testGivesUpAfterMaxAttempts() {
     AtomicInteger attempts = new AtomicInteger();
 

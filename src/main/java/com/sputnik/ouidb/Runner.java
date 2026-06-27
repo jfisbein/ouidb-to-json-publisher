@@ -21,8 +21,10 @@ import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -66,28 +68,33 @@ public class Runner {
   private ExitCode run() throws IOException, GitAPIException {
     ExitCode exitCode;
     File ouiDBFile = getOuiDBFile();
+    File ouiTxtFile = getOuiTxtFile();
 
     try (Git git = getGitRepo()) {
-      Map<String, Organization> parsedDB = downloader.getParsedDB();
-      String json = converter.convertToJson(parsedDB);
-      try (FileWriter writer = new FileWriter(ouiDBFile)) {
-        IOUtils.write(json, writer);
-        writer.flush();
-      }
+      // Download the raw oui.txt once: persist it verbatim (to act as a mirror) and parse it.
+      String rawOuiText = downloader.downloadAsString();
+      writeString(ouiTxtFile, rawOuiText);
+
+      Map<String, Organization> parsedDB = downloader.parse(rawOuiText);
+      writeString(ouiDBFile, converter.convertToJson(parsedDB));
+
+      // Stage the primary files so both new (untracked) and modified files are detected.
+      git.add().addFilepattern(ouiDBFile.getName()).call();
+      git.add().addFilepattern(ouiTxtFile.getName()).call();
       Status status = git.status().call();
-      if (!status.getModified().isEmpty()) {
+
+      if (!status.getAdded().isEmpty() || !status.getChanged().isEmpty()) {
         exitCode = ExitCode.THERES_CHANGES;
-        File compressedGzFile = compressFileToGz(ouiDBFile);
-        File compressedBz2File = compressFileToBz2(ouiDBFile);
-        log.info("OUIDB file changed, uploading to git repo.");
-        git.add().addFilepattern(ouiDBFile.getName()).call();
-        git.add().addFilepattern(compressedGzFile.getName()).call();
-        git.add().addFilepattern(compressedBz2File.getName()).call();
-        git.commit().setMessage("Updated OUIDB json file").call();
+        log.info("OUIDB files changed, uploading to git repo.");
+        for (File file : List.of(ouiDBFile, ouiTxtFile)) {
+          git.add().addFilepattern(compressFileToGz(file).getName()).call();
+          git.add().addFilepattern(compressFileToBz2(file).getName()).call();
+        }
+        git.commit().setMessage("Updated OUIDB json and oui.txt files").call();
         git.push().call();
       } else {
         exitCode = ExitCode.NO_CHANGES;
-        log.info("No changes detected on OUIDB File, nothing to do.");
+        log.info("No changes detected on OUIDB files, nothing to do.");
       }
     }
 
@@ -97,6 +104,17 @@ public class Runner {
 
   private File getOuiDBFile() {
     return new File(params.getDataFolder(), "ouidb.json");
+  }
+
+  private File getOuiTxtFile() {
+    return new File(params.getDataFolder(), "oui.txt");
+  }
+
+  private void writeString(File file, String content) throws IOException {
+    try (Writer writer = new FileWriter(file, StandardCharsets.UTF_8)) {
+      IOUtils.write(content, writer);
+      writer.flush();
+    }
   }
 
   private Git getGitRepo() throws GitAPIException, IOException {

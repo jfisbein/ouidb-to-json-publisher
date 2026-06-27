@@ -7,8 +7,8 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -68,10 +68,26 @@ public class OUIDBDownloader {
   }
 
   public Map<String, Organization> getParsedDB() throws IOException {
-    return ouidbParser.parseDb(download());
+    return parse(downloadAsString());
+  }
+
+  /**
+   * Parses raw OUI text (in the IEEE {@code oui.txt} format) into a map keyed by OUI prefix.
+   */
+  public Map<String, Organization> parse(String rawOuiText) throws IOException {
+    return ouidbParser.parseDb(new StringReader(rawOuiText));
   }
 
   public Reader download() throws IOException {
+    return new StringReader(downloadAsString());
+  }
+
+  /**
+   * Downloads the raw {@code oui.txt} contents as a String, retrying on transient failures.
+   * Exposing the raw text lets callers persist it verbatim (e.g. to publish a mirror) in addition
+   * to parsing it.
+   */
+  public String downloadAsString() throws IOException {
     HttpClient httpClient = getHttpClient();
     HttpRequest httpRequest = buildRequest();
 
@@ -81,7 +97,7 @@ public class OUIDBDownloader {
         HttpResponse<InputStream> httpResponse = httpClient.send(httpRequest, BodyHandlers.ofInputStream());
 
         if (httpResponse != null && httpResponse.statusCode() == 200) {
-          return new InputStreamReader(httpResponse.body(), UTF_8);
+          return IOUtils.toString(httpResponse.body(), UTF_8);
         }
 
         int statusCode = httpResponse == null ? -1 : httpResponse.statusCode();
